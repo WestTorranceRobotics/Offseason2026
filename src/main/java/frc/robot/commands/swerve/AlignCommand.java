@@ -2,28 +2,32 @@ package frc.robot.commands.swerve;
 
 import static frc.robot.utilities.controller.InputProcessing.*;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.SwerveDriveConstants;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.function.DoubleSupplier;
 
-public class DefaultJoystickCommand extends Command {
+public class AlignCommand extends Command {
     private final DoubleSupplier ly;
     private final DoubleSupplier lx;
-    private final DoubleSupplier rx;
+    private final DoubleSupplier relativeYaw;
     private final Swerve drive;
+
+    private final PIDController alignPIDController =
+            new PIDController(SwerveDriveConstants.ALIGN_P, SwerveDriveConstants.ALIGN_I, SwerveDriveConstants.ALIGN_D);
 
     /**
      * @param lx          Translation on the x-axis supplier
      * @param ly          Translation on the y-axis supplier
-     * @param rx          Desired rotation velocity supplier
+     * @param relativeYaw Desired rotation supplier
      * @param swerveDrive Swerve drive train instance
      */
-    public DefaultJoystickCommand(DoubleSupplier lx, DoubleSupplier ly, DoubleSupplier rx, Swerve swerveDrive) {
+    public AlignCommand(DoubleSupplier lx, DoubleSupplier ly, DoubleSupplier relativeYaw, Swerve swerveDrive) {
         this.lx = lx;
         this.ly = ly;
-        this.rx = rx;
+        this.relativeYaw = relativeYaw;
 
         this.drive = swerveDrive;
 
@@ -38,7 +42,7 @@ public class DefaultJoystickCommand extends Command {
         ChassisSpeeds chassisSpeeds = new ChassisSpeeds(
                 -curve(applyDeadband(ly.getAsDouble())) * SwerveDriveConstants.MAX_TRANSLATION_SPEED,
                 -curve(applyDeadband(lx.getAsDouble())) * SwerveDriveConstants.MAX_TRANSLATION_SPEED,
-                -curve(applyDeadband(rx.getAsDouble())) * SwerveDriveConstants.MAX_ANGULAR_SPEED);
+                -alignPIDController.calculate(0, relativeYaw.getAsDouble()) * SwerveDriveConstants.MAX_ANGULAR_SPEED);
 
         drive.drive(chassisSpeeds, true);
     }

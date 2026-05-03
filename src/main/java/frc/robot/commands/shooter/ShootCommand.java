@@ -1,6 +1,5 @@
 package frc.robot.commands.shooter;
 
-import static frc.robot.constants.GlobalConstants.*;
 import static frc.robot.constants.ShooterConstants.*;
 import static frc.robot.constants.VisionConstants.*;
 import static frc.robot.utilities.CustomUnits.RotationsPerMinute;
@@ -43,14 +42,9 @@ public class ShootCommand extends Command {
             shooter.runFeeder();
         }
 
-        int hubAprilTagID = isAllianceBlue() ? 25 : 10;
+        double hubYaw = vision.getYawOfHub();
 
-        var targetHubYaw = vision.getTX(hubAprilTagID);
-
-        if (targetHubYaw.isEmpty()) {
-            swerveDrive.setAlignStatus(false, 0);
-            SmartDashboard.putNumber("Yaw from target", -1);
-
+        if (hubYaw == 0.0) {
             if (lastShooterMapRPM > 0 && lastDistanceToHub >= 1.5) {
                 // If our last distance detected was within the range of DISTANCE_VS_RPM_MAP
                 // and we have detected the tag at least once
@@ -68,15 +62,14 @@ public class ShootCommand extends Command {
                 shooter.setFlywheelSpeed(RotationsPerMinute.of(MINIMUM_SHOOTER_RPM));
             }
         } else {
-            swerveDrive.setAlignStatus(true, targetHubYaw.get());
-            if (vision.getDistance(hubAprilTagID).isPresent()) {
-                lastDistanceToHub = vision.getDistance(hubAprilTagID).get();
+            if (vision.getDistance(vision.getHubAprilTagID()).isPresent()) {
+                lastDistanceToHub =
+                        vision.getDistance(vision.getHubAprilTagID()).get();
             }
 
-            SmartDashboard.putNumber("Yaw from target", targetHubYaw.get());
             SmartDashboard.putNumber("Distance from hub", lastDistanceToHub);
 
-            if (Math.abs(targetHubYaw.get()) <= YAW_ACCEPTABLE_ERROR) {
+            if (Math.abs(hubYaw) <= YAW_ACCEPTABLE_ERROR) {
                 if (lastDistanceToHub == -1) {
                     shooter.setFlywheelSpeed(RotationsPerMinute.of(MINIMUM_SHOOTER_RPM));
                 }
@@ -90,7 +83,6 @@ public class ShootCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        swerveDrive.setAlignStatus(false, 0);
         swerveDrive.drive(new ChassisSpeeds(), true);
         shooter.stopShooter();
         hopper.stopHopper();

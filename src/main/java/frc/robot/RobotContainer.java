@@ -4,20 +4,16 @@
 
 package frc.robot;
 
-import static frc.robot.constants.GlobalConstants.*;
-import static frc.robot.constants.ShooterConstants.YAW_ACCEPTABLE_ERROR;
-import static frc.robot.utilities.CustomUnits.RotationsPerMinute;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.shooter.ShootCommand;
-import frc.robot.commands.swerve.AutonomousPeriodicCommand;
+import frc.robot.commands.shooter.AlignAndShootCommand;
+import frc.robot.commands.shooter.OverrideShootCommand;
+import frc.robot.commands.swerve.AlignCommand;
 import frc.robot.commands.swerve.DefaultJoystickCommand;
 import frc.robot.constants.GlobalConstants.OperatorConstants;
 import frc.robot.subsystems.hopper.Hopper;
@@ -112,40 +108,9 @@ public class RobotContainer {
     }
 
     private void registerNamedCommands() {
-        var alignCommand = Commands.startRun(
-                        () -> {
-                            swerveDrive.setAlignStatus(true, 0);
-                            // PPHolonomicDriveController.overrideRotationFeedback(() ->
-                            // -swerveDrive.getChassisSpeed().omegaRadiansPerSecond);
-                        },
-                        () -> {
-                            swerveDrive.drive(new ChassisSpeeds(), true);
-                        })
-                .until(() -> {
-                    var apriltagId = isAllianceBlue() ? 25 : 10;
-                    var yaw = vision.getTX(apriltagId);
-                    if (yaw.isEmpty()) {
-                        SmartDashboard.putNumber("Yaw from target", -1);
-                        return true; // Break because no AprilTag was found
-                    }
-                    SmartDashboard.putNumber("Yaw from target", yaw.get());
-                    swerveDrive.setAlignStatus(true, yaw.get());
-                    return Math.abs(yaw.get())
-                            < YAW_ACCEPTABLE_ERROR; // Break when we're within acceptable yaw to shoot
-                })
-                .finallyDo(() -> {
-                    swerveDrive.setAlignStatus(false, 0);
-                    swerveDrive.drive(new ChassisSpeeds(), true);
-                });
-        NamedCommands.registerCommand("align", alignCommand);
-
         NamedCommands.registerCommand(
                 "alignAndShoot",
-                Commands.parallel(
-                        Commands.run(() -> {
-                            swerveDrive.drive(new ChassisSpeeds(), true);
-                        }),
-                        new ShootCommand(shooter, swerveDrive, vision, hopper).withTimeout(6)));
+                new AlignAndShootCommand(() -> 0, () -> 0, swerveDrive, shooter, vision, hopper).withTimeout(6));
 
         NamedCommands.registerCommand("startIntake", intake.runOnce(intake::intake));
 
@@ -157,31 +122,24 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        // Sets the controller as the default movement command for swerve.
+        swerveDrive.setDefaultCommand(new DefaultJoystickCommand(
+                controller::getLeftX, controller::getLeftY, controller::getRightX, swerveDrive));
+
         // reset the heading of the swerve
-        controller.zero().onTrue(Commands.runOnce(this::zeroHeading));
+        controller.zero().onTrue(Commands.runOnce(swerveDrive::zeroHeading));
 
         // shooter button mapping
-        controller.aOrCross().whileTrue(new ShootCommand(shooter, swerveDrive, vision, hopper));
+        controller
+                .aOrCross()
+                .whileTrue(new AlignAndShootCommand(
+                        controller::getLeftX, controller::getLeftY, swerveDrive, shooter, vision, hopper));
 
         // align button mapping
         controller
                 .bOrCircle()
-                .whileTrue(Commands.run(() -> {
-                    if (vision.getBestTarget() == null) return;
-                    // align robot to best AprilTag
-                    //     swerveDrive.setAlignStatus(
-                    //             true,
-                    //             vision.getTX(vision.getBestTarget().getFiducialId())
-                    //                     .orElse(null));
-                    int hubAprilTagID = isAllianceBlue() ? 25 : 10;
-                    if (vision.getTX(hubAprilTagID).orElse(null) != null) {
-                        swerveDrive.setAlignStatus(
-                                true, vision.getTX(hubAprilTagID).get());
-                    }
-                }))
-                .onFalse(Commands.run(() -> {
-                    swerveDrive.setAlignStatus(false, 0);
-                }));
+                .whileTrue(
+                        new AlignCommand(controller::getLeftX, controller::getLeftY, vision::getYawOfHub, swerveDrive));
 
         controller.xOrSquare().toggleOnTrue(intake.intakeCommand());
         controller.yOrTriangle().toggleOnTrue(intake.outtakeCommand());
@@ -189,56 +147,13 @@ public class RobotContainer {
         controller.dPadUp().whileTrue(intake.sendHoodUpCommand());
         controller.dPadDown().whileTrue(intake.sendHoodDownCommand());
 
-        overrideController
-                .aOrCross()
-                .whileTrue(Commands.parallel(
-                        hopper.runHopperCommand(), shooter.runShooterCommand(RotationsPerMinute.of(2700.0))));
+        overrideController.aOrCross().whileTrue(new OverrideShootCommand(shooter, hopper, 2700.0));
 
-        overrideController
-                .bOrCircle()
-                .whileTrue(Commands.parallel(
-                        hopper.runHopperCommand(), shooter.runShooterCommand(RotationsPerMinute.of(3850.0))));
+        overrideController.bOrCircle().whileTrue(new OverrideShootCommand(shooter, hopper, 3200.0));
 
-        overrideController
-                .xOrSquare()
-                .whileTrue(Commands.parallel(
-                        hopper.runHopperCommand(), shooter.runShooterCommand(RotationsPerMinute.of(4316.6667))));
+        overrideController.xOrSquare().whileTrue(new OverrideShootCommand(shooter, hopper, 3700.0));
 
-        overrideController
-                .yOrTriangle()
-                .whileTrue(Commands.parallel(
-                        hopper.runHopperCommand(), shooter.runShooterCommand(RotationsPerMinute.of(4767.0))));
-    }
-
-    /**
-     * Sets the controller as the default movement command for swerve.
-     */
-    public void bindJoystickCommand() {
-        swerveDrive.setDefaultCommand(new DefaultJoystickCommand(
-                controller::getLeftX, controller::getLeftY, controller::getRightX, swerveDrive));
-        // m_swerveDrive.setDefaultCommand(new SysIDCommand(m_swerveDrive,
-        // SysIDCommand.Routine.DRIVE_VELOCITY_DYNAMIC, controller));
-    }
-
-    public void zeroHeading() {
-        swerveDrive.zeroHeading();
-    }
-
-    /**
-     * Removes the controller from being used for movement.
-     */
-    public void unbindJoystick() {
-        try {
-            swerveDrive.getDefaultCommand().cancel();
-        } catch (NullPointerException e) {
-            DriverStation.reportError("Tried to unbind non existent default command", true);
-        }
-
-        swerveDrive.removeDefaultCommand();
-    }
-
-    public void bindAutoCommand() {
-        swerveDrive.setDefaultCommand(new AutonomousPeriodicCommand(swerveDrive));
+        overrideController.yOrTriangle().whileTrue(new OverrideShootCommand(shooter, hopper, 4200.0));
     }
 
     /**

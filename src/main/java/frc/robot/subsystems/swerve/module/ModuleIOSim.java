@@ -10,10 +10,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import frc.robot.MathUtils;
 import frc.robot.RobotContainer;
 import frc.robot.constants.GlobalConstants;
 import frc.robot.subsystems.swerve.SwerveConfigurator;
+import frc.robot.utilities.MathUtils;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
@@ -50,10 +50,10 @@ public class ModuleIOSim implements ModuleIO {
                 swerveModuleSimulation.useGenericMotorControllerForDrive().withCurrentLimit(Amps.of(80));
         this.steerMotor = swerveModuleSimulation.useGenericControllerForSteer().withCurrentLimit(Amps.of(20));
 
-        this.driveFeedforward = new SimpleMotorFeedforward(moduleConstants.kSDrive, moduleConstants.kVDrive, 0);
-        this.drivePID = new PIDController(moduleConstants.kPDrive, moduleConstants.kIDrive, moduleConstants.kDDrive);
+        this.driveFeedforward = new SimpleMotorFeedforward(moduleConstants.DRIVE_S, moduleConstants.DRIVE_V, 0);
+        this.drivePID = new PIDController(moduleConstants.DRIVE_P, moduleConstants.DRIVE_I, moduleConstants.DRIVE_D);
         this.steerPID =
-                new PIDController(moduleConstants.kPAzimuth, moduleConstants.kIAzimuth, moduleConstants.kDAzimuth);
+                new PIDController(moduleConstants.AZIMUTH_P, moduleConstants.AZIMUTH_I, moduleConstants.AZIMUTH_D);
         steerPID.enableContinuousInput(-Math.PI, Math.PI);
 
         this.moduleName = moduleConstants.getModuleName();

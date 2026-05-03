@@ -9,7 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.wpilibj.DriverStation;
+import org.ironmaple.utils.FieldMirroringUtils;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -24,12 +24,6 @@ import edu.wpi.first.wpilibj.DriverStation;
  * constants are needed, to reduce verbosity.
  */
 public final class GlobalConstants {
-    public static boolean isAllianceBlue() {
-        return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(DriverStation.Alliance.Blue)
-                ? true
-                : false;
-    }
-
     public static class OperatorConstants {
         public static final int DRIVER_CONTROLLER_PORT = 0;
         public static final int OVERRIDE_CONTROLLER_PORT = 1;
@@ -38,17 +32,17 @@ public final class GlobalConstants {
     }
 
     public static class FieldConstants {
-        public static final Translation2d BLUE_HUB_POSITION = new Translation2d(4.62, 4.035);
-        public static final Translation2d RED_HUB_POSITION = new Translation2d(11.92105, 4.035);
+        public static final Translation2d HUB_POSITION =
+                FieldMirroringUtils.toCurrentAllianceTranslation(new Translation2d(4.62, 4.035));
     }
 
     public static class PhysicalRobotConstants {
         public static final Mass ROBOT_MASS = Kilograms.of(35);
 
-        public static final Distance kDriveBaseLength = Inches.of(20);
+        public static final Distance DRIVE_BASE_LENGTH = Inches.of(20);
         // TODO: verify width is correct
-        public static final Distance kDriveBaseWidth = Inches.of(22.5);
+        public static final Distance DRIVE_BASE_WIDTH = Inches.of(22.5);
 
-        public static final Distance k_wheelRadius = Inches.of(2);
+        public static final Distance WHEEL_RADIUS = Inches.of(2);
     }
 }

@@ -6,7 +6,10 @@ public final class SwerveDriveConstants {
     public static final double MAX_TRANSLATION_SPEED = 4;
     public static final double MAX_ANGULAR_SPEED = 6;
 
-    public static final double PROPORTIONALITY_CONSTANT = 0.0123245;
+    // TODO: Tune PID for align
+    public static final double ALIGN_P = 0.04;
+    public static final double ALIGN_I = 0;
+    public static final double ALIGN_D = 0.001;
 
     public static final double SKEW_COMPENSATION_FACTOR = 0.04;
 
@@ -36,23 +39,23 @@ public final class SwerveDriveConstants {
         public static final double BL_CANCODER_OFFSET = 0.493896484375;
         public static final double BR_CANCODER_OFFSET = -0.037353515625;
 
-        public static final double kPDrive = 0.098616;
-        public static final double kIDrive = 0;
-        public static final double kDDrive = 0;
-        public static final double kSDrive = 0.0058039;
-        public static final double kVDrive = 0.11504;
+        public static final double DRIVE_P = 0.098616;
+        public static final double DRIVE_I = 0;
+        public static final double DRIVE_D = 0;
+        public static final double DRIVE_S = 0.0058039;
+        public static final double DRIVE_V = 0.11504;
 
-        public static final double kPAzimuth = 2;
-        public static final double kIAzimuth = 0;
-        public static final double kDAzimuth = 0;
+        public static final double AZIMUTH_P = 2;
+        public static final double AZIMUTH_I = 0;
+        public static final double AZIMUTH_D = 0;
 
-        public static final double kPTranslation = .1;
-        public static final double kITranslation = 0;
-        public static final double kDTranslation = 0;
+        public static final double TRANSLATION_P = .1;
+        public static final double TRANSLATION_I = 0;
+        public static final double TRANSLATION_D = 0;
 
-        public static final double kPRotation = 13.26;
-        public static final double kIRotation = 0;
-        public static final double kDRotation = 0.59364;
+        public static final double ROTATION_P = 13.26;
+        public static final double ROTATION_I = 0;
+        public static final double ROTATION_D = 0.59364;
 
         public static class RealModuleConstants {
             public static SwerveConfigurator.SwerveDriveModuleConstants FLModuleConstants =
@@ -62,14 +65,14 @@ public final class SwerveDriveConstants {
                             RealRobotConstants.FL_DRIVE_MOTOR_ID,
                             RealRobotConstants.FL_AZIMUTH_MOTOR_ID,
                             RealRobotConstants.FL_CANCODER_OFFSET,
-                            RealRobotConstants.kPDrive,
-                            RealRobotConstants.kIDrive,
-                            RealRobotConstants.kDDrive,
-                            RealRobotConstants.kSDrive,
-                            RealRobotConstants.kVDrive,
-                            RealRobotConstants.kPAzimuth,
-                            RealRobotConstants.kIAzimuth,
-                            RealRobotConstants.kDAzimuth,
+                            RealRobotConstants.DRIVE_P,
+                            RealRobotConstants.DRIVE_I,
+                            RealRobotConstants.DRIVE_D,
+                            RealRobotConstants.DRIVE_S,
+                            RealRobotConstants.DRIVE_V,
+                            RealRobotConstants.AZIMUTH_P,
+                            RealRobotConstants.AZIMUTH_I,
+                            RealRobotConstants.AZIMUTH_D,
                             0,
                             3,
                             false,
@@ -102,17 +105,17 @@ public final class SwerveDriveConstants {
     }
 
     public static class SimulatedControlSystemConstants {
-        public static final double kSDrive = 0;
-        public static final double kVDrive = 2.435;
-        public static final double kADrive = 0;
+        public static final double DRIVE_S = 0;
+        public static final double DRIVE_V = 2.435;
+        public static final double DRIVE_A = 0;
 
-        public static final double kPDrive = 8;
-        public static final double kIDrive = 0;
-        public static final double kDDrive = 0;
+        public static final double DRIVE_P = 8;
+        public static final double DRIVE_I = 0;
+        public static final double DRIVE_D = 0;
 
-        public static final double kPSteer = 13.26;
-        public static final double kISteer = 0;
-        public static final double kDSteer = 0.59364;
+        public static final double STEER_P = 13.26;
+        public static final double STEER_I = 0;
+        public static final double STEER_D = 0.59364;
 
         public static class SimulatedModuleConstants {
             public static SwerveConfigurator.SwerveDriveModuleConstants FLModuleConstants =
@@ -122,14 +125,14 @@ public final class SwerveDriveConstants {
                             0,
                             0,
                             0,
-                            SwerveDriveConstants.SimulatedControlSystemConstants.kPDrive,
-                            SwerveDriveConstants.SimulatedControlSystemConstants.kIDrive,
-                            SwerveDriveConstants.SimulatedControlSystemConstants.kDDrive,
+                            SwerveDriveConstants.SimulatedControlSystemConstants.DRIVE_P,
+                            SwerveDriveConstants.SimulatedControlSystemConstants.DRIVE_I,
+                            SwerveDriveConstants.SimulatedControlSystemConstants.DRIVE_D,
                             0,
-                            SwerveDriveConstants.SimulatedControlSystemConstants.kVDrive,
-                            SwerveDriveConstants.SimulatedControlSystemConstants.kPSteer,
-                            SwerveDriveConstants.SimulatedControlSystemConstants.kISteer,
-                            SwerveDriveConstants.SimulatedControlSystemConstants.kDSteer,
+                            SwerveDriveConstants.SimulatedControlSystemConstants.DRIVE_V,
+                            SwerveDriveConstants.SimulatedControlSystemConstants.STEER_P,
+                            SwerveDriveConstants.SimulatedControlSystemConstants.STEER_I,
+                            SwerveDriveConstants.SimulatedControlSystemConstants.STEER_D,
                             0,
                             2,
                             false,

@@ -1,14 +1,12 @@
 package frc.robot.subsystems.vision;
 
 import static frc.robot.constants.VisionConstants.*;
+import static org.ironmaple.utils.FieldMirroringUtils.isSidePresentedAsRed;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.EstimateConsumer;
 import frc.robot.subsystems.vision.VisionIO.VisionIOInputs;
@@ -52,7 +50,7 @@ public class Vision extends SubsystemBase {
                 if (estimatedPose.isEmpty()) estimatedPose = photonEstimator.estimateClosestToCameraHeightPose(result);
             }
         }
-        fuseVisionEstimates();
+        fuseVisionPoseEstimates();
     }
 
     private PhotonTrackedTarget getTrackedTarget(int targetID) {
@@ -88,19 +86,27 @@ public class Vision extends SubsystemBase {
         return bestTarget;
     }
 
-    public Optional<Double> getTX(int targetID) {
+    public Optional<Double> getYaw(int targetID) {
         PhotonTrackedTarget target = getTrackedTarget(targetID);
         if (target != null) return Optional.of(target.getYaw());
         return Optional.empty();
     }
 
-    public Optional<Double> getTY(int targetID) {
+    public Optional<Double> getPitch(int targetID) {
         PhotonTrackedTarget target = getTrackedTarget(targetID);
         if (target != null) return Optional.of(target.getPitch());
         return Optional.empty();
     }
 
-    public void fuseVisionEstimates() {
+    public int getHubAprilTagID() {
+        return isSidePresentedAsRed() ? 10 : 25;
+    }
+
+    public double getYawOfHub() {
+        return getYaw(getHubAprilTagID()).orElse(0.0);
+    }
+
+    public void fuseVisionPoseEstimates() {
         estimatedPose.ifPresent(est -> {
             int tagCount = est.targetsUsed.size();
             double averageDistance = 0;
@@ -120,9 +126,8 @@ public class Vision extends SubsystemBase {
                     * (1.0 + (maxAmbiguity * AMBIGUITY_WEIGHT))
                     / Math.sqrt(tagCount);
 
-            // The heading is flipped to account for camera being on the "back" of the robot
             estConsumer.accept(
-                    est.estimatedPose.toPose2d().transformBy(new Transform2d(new Translation2d(), Rotation2d.k180deg)),
+                    est.estimatedPose.toPose2d(),
                     est.timestampSeconds,
                     VecBuilder.fill(xyStdDev, xyStdDev, Double.MAX_VALUE));
         });

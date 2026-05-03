@@ -26,10 +26,10 @@ public class VisionIOSim implements VisionIO {
         SimCameraProperties cameraProps = new SimCameraProperties();
 
         // Diagonal FOV was calculated from horizontal and vertical FOV given from
-        // https://docs.limelightvision.io/docs/docs-limelight/getting-started/limelight-3#hardware-specifications
-        cameraProps.setCalibration(640, 480, Rotation2d.fromDegrees(74.34285844));
+        // https://www.arducam.com/ov9281-mipi-1mp-monochrome-global-shutter-camera-module-m12-mount-lens-raspberry-pi
+        cameraProps.setCalibration(1280, 800, Rotation2d.fromDegrees(82));
         cameraProps.setCalibError(0.25, 0.08);
-        cameraProps.setFPS(50);
+        cameraProps.setFPS(15);
         cameraProps.setAvgLatencyMs(16);
         cameraProps.setLatencyStdDevMs(5);
 
@@ -38,7 +38,7 @@ public class VisionIOSim implements VisionIO {
 
         Rotation3d cameraRotation =
                 new Rotation3d(0, Degrees.of(-15).in(Radians), Degrees.of(180).in(Radians));
-        Transform3d cameraPosition = new Transform3d(new Translation3d(-0.3, 0, 0), cameraRotation);
+        Transform3d cameraPosition = new Transform3d(new Translation3d(-0.3, 0, 0.5), cameraRotation);
 
         visionSystemSim.addCamera(cameraSim, cameraPosition);
 

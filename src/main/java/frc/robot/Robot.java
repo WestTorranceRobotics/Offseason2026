@@ -66,12 +66,9 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-        // Ensures that operator cannot move robot during autonomous
-        // WARN do not remove, will break path planner
-        m_robotContainer.unbindJoystick();
-        m_robotContainer.bindAutoCommand();
-
-        if (autonomousCommand != null) CommandScheduler.getInstance().schedule(autonomousCommand);
+        if (autonomousCommand != null) {
+            CommandScheduler.getInstance().schedule(autonomousCommand);
+        }
     }
 
     /** This function is called periodically during autonomous. */
@@ -81,10 +78,7 @@ public class Robot extends TimedRobot {
     /** Called at beginning of teleop */
     @Override
     public void teleopInit() {
-        // Make sure that our movement command is registered
-        m_robotContainer.unbindJoystick();
-        m_robotContainer.bindJoystickCommand();
-
+        // Makes sure the autonomous command stops running when teleop starts.
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }

@@ -1,7 +1,7 @@
 package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.constants.GlobalConstants.isAllianceBlue;
+import static org.ironmaple.utils.FieldMirroringUtils.isSidePresentedAsRed;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.GlobalConstants;
+import frc.robot.constants.GlobalConstants.FieldConstants;
 import frc.robot.constants.SwerveDriveConstants;
 import frc.robot.constants.SwerveDriveConstants.RealRobotConstants;
 import frc.robot.subsystems.swerve.gyroscope.Gyro;
@@ -61,10 +61,6 @@ public class Swerve extends SubsystemBase {
                     .getStructArrayTopic("Desired Module States", SwerveModuleState.struct)
                     .publish();
 
-    // These are used to override driver rotation if aligning
-    private boolean isAligning;
-    private double targetRotationYaw;
-
     private final SwerveDriveIO io;
 
     public Swerve(SwerveDriveIO io, GyroIO gyroIO, Module[] modules) {
@@ -77,7 +73,7 @@ public class Swerve extends SubsystemBase {
         this.backRight = modules[3];
 
         this.swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(
-                swerveDriveKinematics, this.gyro.getRotation(), getModulePositions(), Pose2d.kZero);
+                swerveDriveKinematics, gyro.getRotation(), getModulePositions(), Pose2d.kZero);
 
         RobotConfig ppConfig;
         try {
@@ -90,64 +86,44 @@ public class Swerve extends SubsystemBase {
                 this::getPose,
                 this::setPose,
                 this::getChassisSpeed,
-                (ChassisSpeeds speeds) -> this.drive(speeds, false),
+                (ChassisSpeeds speeds) -> drive(speeds, false),
                 new PPHolonomicDriveController(
                         new PIDConstants(
-                                RealRobotConstants.kPTranslation,
-                                RealRobotConstants.kITranslation,
-                                RealRobotConstants.kDTranslation),
+                                RealRobotConstants.TRANSLATION_P,
+                                RealRobotConstants.TRANSLATION_I,
+                                RealRobotConstants.TRANSLATION_D),
                         new PIDConstants(
-                                RealRobotConstants.kPRotation,
-                                RealRobotConstants.kIRotation,
-                                RealRobotConstants.kDRotation)),
+                                RealRobotConstants.ROTATION_P,
+                                RealRobotConstants.ROTATION_I,
+                                RealRobotConstants.ROTATION_D)),
                 ppConfig,
                 () -> {
-                    if (isAllianceBlue()) {
-                        return false;
-                    }
-                    return true;
+                    return isSidePresentedAsRed();
                 });
 
         initTelemetry();
     }
 
     public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
-        if (isAligning) {
-            chassisSpeeds = createAlignChassisSpeeds(
-                    chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, targetRotationYaw);
-        } else if (fieldRelative) {
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    chassisSpeeds,
-                    Rotation2d.fromRadians(this.getHeading().getRadians() + (isAllianceBlue() ? 0 : Math.PI))
-                            .plus(Rotation2d.fromRadians(chassisSpeeds.omegaRadiansPerSecond
-                                    * SwerveDriveConstants.SKEW_COMPENSATION_FACTOR)));
+        if (fieldRelative) {
+            Rotation2d fieldRelativeHeading =
+                    Rotation2d.fromRadians(getHeading().getRadians() + (isSidePresentedAsRed() ? Math.PI : 0));
+            Rotation2d skewCompensation = Rotation2d.fromRadians(
+                    chassisSpeeds.omegaRadiansPerSecond * SwerveDriveConstants.SKEW_COMPENSATION_FACTOR);
+            chassisSpeeds =
+                    ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, fieldRelativeHeading.plus(skewCompensation));
         }
         calculateStates(chassisSpeeds);
     }
 
-    public ChassisSpeeds createAlignChassisSpeeds(
-            double vxMetersPerSecond, double vyMetersPerSecond, double targetRotationYaw) {
-        return new ChassisSpeeds(
-                vxMetersPerSecond,
-                vyMetersPerSecond,
-                -targetRotationYaw
-                        * SwerveDriveConstants.PROPORTIONALITY_CONSTANT
-                        * SwerveDriveConstants.MAX_ANGULAR_SPEED);
-    }
-
-    public void setAlignStatus(boolean isAligning, double targetRotationYaw) {
-        this.isAligning = isAligning;
-        this.targetRotationYaw = targetRotationYaw;
-    }
-
     public Rotation2d getAngleToHub() {
         Translation2d robotTranslation = getPose().getTranslation();
-        Translation2d hubPosition = isAllianceBlue()
-                ? GlobalConstants.FieldConstants.BLUE_HUB_POSITION
-                : GlobalConstants.FieldConstants.RED_HUB_POSITION;
+        Translation2d hubPosition = FieldConstants.HUB_POSITION;
 
-        return new Rotation2d(
-                Math.atan2(hubPosition.getY() - robotTranslation.getY(), hubPosition.getX() - robotTranslation.getX()));
+        return new Rotation2d(Math.atan2(
+                        hubPosition.getY() - robotTranslation.getY(), hubPosition.getX() - robotTranslation.getX()))
+                .minus(getHeading())
+                .rotateBy(Rotation2d.k180deg);
     }
 
     @Override
@@ -163,14 +139,6 @@ public class Swerve extends SubsystemBase {
         publishTelemetry();
     }
 
-    public void tickPid() {
-        // Some PIDs need to be calculated, do that here
-        frontRight.tickPID();
-        frontLeft.tickPID();
-        backRight.tickPID();
-        backLeft.tickPID();
-    }
-
     private void publishTelemetry() {
         estimatedPosePublisher.set(swerveDrivePoseEstimator.getEstimatedPosition());
         currentModuleStatesPublisher.set(getModuleStates());
@@ -183,7 +151,7 @@ public class Swerve extends SubsystemBase {
     }
 
     private void calculateStates(ChassisSpeeds chassisSpeeds) {
-        Module[] modules = this.getModules();
+        Module[] modules = getModules();
 
         chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
         SwerveModuleState[] moduleStates = swerveDriveKinematics.toSwerveModuleStates(chassisSpeeds);
@@ -194,6 +162,7 @@ public class Swerve extends SubsystemBase {
                     moduleStates[i].angle.minus(modules[i].getSteerAngle()).getCos();
 
             modules[i].setDesiredState(MetersPerSecond.of(moduleStates[i].speedMetersPerSecond), moduleStates[i].angle);
+            modules[i].tickPID();
         }
     }
 
@@ -208,7 +177,7 @@ public class Swerve extends SubsystemBase {
 
     public void setPose(Pose2d pose) {
         io.setSimulationWorldPose(pose);
-        swerveDrivePoseEstimator.resetPosition(gyro.getRotation(), getModulePositions(), pose);
+        swerveDrivePoseEstimator.resetPosition(Rotation2d.kZero, getModulePositions(), pose);
     }
 
     public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
@@ -258,8 +227,7 @@ public class Swerve extends SubsystemBase {
 
     public Command lockWheelsInX() {
         return Commands.run(() -> {
-            this.setAlignStatus(false, 0);
-            var modules = this.getModules();
+            var modules = getModules();
             for (int i = 0; i < 4; i++) {
                 modules[i].setDesiredState(MetersPerSecond.zero(), Rotation2d.fromDegrees((i * 90) - 45));
             }

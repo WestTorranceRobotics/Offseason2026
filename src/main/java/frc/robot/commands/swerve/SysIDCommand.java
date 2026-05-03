@@ -139,6 +139,8 @@ public class SysIDCommand extends Command {
                         new SysIdRoutine.Config((Volts.of(1)).per(Second), Volts.of(7), Seconds.of(10)),
                         new SysIdRoutine.Mechanism(this::setAzimuthVoltage, this::logSteer, swerve));
                 break;
+            default:
+                break;
         }
 
         setAzimuth(Radians.of(0));
@@ -180,11 +182,12 @@ public class SysIDCommand extends Command {
             case DRIVE_VELOCITY_QUASISTATIC:
             case DRIVE_VELOCITY_DYNAMIC_REVERSE:
             case DRIVE_VELOCITY_QUASISTATIC_REVERSE:
-                swerve.tickPid();
                 break;
 
             case TELEOP:
                 defaultJoystickCommand.execute();
+                break;
+            default:
                 break;
         }
     }

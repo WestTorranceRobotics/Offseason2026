@@ -67,11 +67,11 @@ public class ModuleIOReal implements ModuleIO {
         TalonFXConfigurator driveMotorConfigurator = driveMotorController.getConfigurator();
 
         Slot0Configs slot0Configs = new Slot0Configs();
-        slot0Configs.kP = moduleConstants.kPDrive;
-        slot0Configs.kI = moduleConstants.kIDrive;
-        slot0Configs.kD = moduleConstants.kDDrive;
-        slot0Configs.kV = moduleConstants.kVDrive;
-        slot0Configs.kS = moduleConstants.kSDrive;
+        slot0Configs.kP = moduleConstants.DRIVE_P;
+        slot0Configs.kI = moduleConstants.DRIVE_I;
+        slot0Configs.kD = moduleConstants.DRIVE_D;
+        slot0Configs.kV = moduleConstants.DRIVE_V;
+        slot0Configs.kS = moduleConstants.DRIVE_S;
         driveMotorConfigurator.apply(slot0Configs);
         driveMotorConfigurator.apply(new CurrentLimitsConfigs()
                 .withStatorCurrentLimitEnable(true)
@@ -103,7 +103,7 @@ public class ModuleIOReal implements ModuleIO {
         steerMotorController.configure(sparkMaxConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         steerPIDController =
-                new PIDController(moduleConstants.kPAzimuth, moduleConstants.kIAzimuth, moduleConstants.kDAzimuth);
+                new PIDController(moduleConstants.AZIMUTH_P, moduleConstants.AZIMUTH_I, moduleConstants.AZIMUTH_D);
         steerPIDController.enableContinuousInput(-Math.PI, Math.PI);
         steerPIDController.setTolerance(0.05);
 

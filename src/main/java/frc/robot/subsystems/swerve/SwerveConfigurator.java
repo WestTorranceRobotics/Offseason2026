@@ -152,16 +152,16 @@ public class SwerveConfigurator {
 
         public final double CANCoderOffset;
 
-        public final double kPDrive;
-        public final double kIDrive;
-        public final double kDDrive;
-        public final double kSDrive;
-        public final double kVDrive;
+        public final double DRIVE_P;
+        public final double DRIVE_I;
+        public final double DRIVE_D;
+        public final double DRIVE_S;
+        public final double DRIVE_V;
 
-        public final double kPAzimuth;
-        public final double kIAzimuth;
-        public final double kDAzimuth;
-        public final double kSAzimuth;
+        public final double AZIMUTH_P;
+        public final double AZIMUTH_I;
+        public final double AZIMUTH_D;
+        public final double AZIMUTH_S;
 
         public final double driveGearRatio;
 
@@ -184,16 +184,16 @@ public class SwerveConfigurator {
 
             this.CANCoderOffset = CANCoderOffset;
 
-            this.kPDrive = clonedConstants.kPDrive;
-            this.kIDrive = clonedConstants.kIDrive;
-            this.kDDrive = clonedConstants.kDDrive;
-            this.kSDrive = clonedConstants.kSDrive;
-            this.kVDrive = clonedConstants.kVDrive;
+            this.DRIVE_P = clonedConstants.DRIVE_P;
+            this.DRIVE_I = clonedConstants.DRIVE_I;
+            this.DRIVE_D = clonedConstants.DRIVE_D;
+            this.DRIVE_S = clonedConstants.DRIVE_S;
+            this.DRIVE_V = clonedConstants.DRIVE_V;
 
-            this.kPAzimuth = clonedConstants.kPAzimuth;
-            this.kIAzimuth = clonedConstants.kIAzimuth;
-            this.kDAzimuth = clonedConstants.kDAzimuth;
-            this.kSAzimuth = clonedConstants.kSAzimuth;
+            this.AZIMUTH_P = clonedConstants.AZIMUTH_P;
+            this.AZIMUTH_I = clonedConstants.AZIMUTH_I;
+            this.AZIMUTH_D = clonedConstants.AZIMUTH_D;
+            this.AZIMUTH_S = clonedConstants.AZIMUTH_S;
 
             this.driveGearRatio = clonedConstants.driveGearRatio;
 
@@ -207,15 +207,15 @@ public class SwerveConfigurator {
                 int driveMotorID,
                 int azimuthMotorID,
                 double CANCoderOffset,
-                double kPDrive,
-                double kIDrive,
-                double kDDrive,
-                double kSDrive,
-                double kVDrive,
-                double kPAzimuth,
-                double kIAzimuth,
-                double kDAzimuth,
-                double kSAzimuth,
+                double DRIVE_P,
+                double DRIVE_I,
+                double DRIVE_D,
+                double DRIVE_S,
+                double DRIVE_V,
+                double AZIMUTH_P,
+                double AZIMUTH_I,
+                double AZIMUTH_D,
+                double AZIMUTH_S,
                 int azimuthReverseCount,
                 boolean shaftFacingUp,
                 double driveGearRatio) {
@@ -227,16 +227,16 @@ public class SwerveConfigurator {
 
             this.CANCoderOffset = CANCoderOffset;
 
-            this.kPDrive = kPDrive;
-            this.kIDrive = kIDrive;
-            this.kDDrive = kDDrive;
-            this.kSDrive = kSDrive;
-            this.kVDrive = kVDrive;
+            this.DRIVE_P = DRIVE_P;
+            this.DRIVE_I = DRIVE_I;
+            this.DRIVE_D = DRIVE_D;
+            this.DRIVE_S = DRIVE_S;
+            this.DRIVE_V = DRIVE_V;
 
-            this.kPAzimuth = kPAzimuth;
-            this.kIAzimuth = kIAzimuth;
-            this.kDAzimuth = kDAzimuth;
-            this.kSAzimuth = kSAzimuth;
+            this.AZIMUTH_P = AZIMUTH_P;
+            this.AZIMUTH_I = AZIMUTH_I;
+            this.AZIMUTH_D = AZIMUTH_D;
+            this.AZIMUTH_S = AZIMUTH_S;
 
             this.driveGearRatio = driveGearRatio;
 
