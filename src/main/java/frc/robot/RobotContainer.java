@@ -16,6 +16,7 @@ import frc.robot.commands.shooter.OverrideShootCommand;
 import frc.robot.commands.swerve.AlignCommand;
 import frc.robot.commands.swerve.DefaultJoystickCommand;
 import frc.robot.constants.GlobalConstants.OperatorConstants;
+import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.hopper.HopperIOReal;
 import frc.robot.subsystems.hopper.HopperIOSim;
@@ -147,7 +148,9 @@ public class RobotContainer {
         controller.dPadUp().whileTrue(intake.sendHoodUpCommand());
         controller.dPadDown().whileTrue(intake.sendHoodDownCommand());
 
-        overrideController.aOrCross().whileTrue(new OverrideShootCommand(shooter, hopper, 2700.0));
+        overrideController
+                .aOrCross()
+                .whileTrue(new OverrideShootCommand(shooter, hopper, ShooterConstants.MINIMUM_SHOOTER_RPM));
 
         overrideController.bOrCircle().whileTrue(new OverrideShootCommand(shooter, hopper, 3200.0));
 

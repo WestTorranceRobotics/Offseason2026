@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
 import static org.ironmaple.utils.FieldMirroringUtils.isSidePresentedAsRed;
+import static org.ironmaple.utils.FieldMirroringUtils.toCurrentAllianceTranslation;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -116,9 +117,16 @@ public class Swerve extends SubsystemBase {
         calculateStates(chassisSpeeds);
     }
 
-    public Rotation2d getAngleToHub() {
+    public Rotation2d getShootingAngle() {
         Translation2d robotTranslation = getPose().getTranslation();
-        Translation2d hubPosition = FieldConstants.HUB_POSITION;
+        Translation2d hubPosition = toCurrentAllianceTranslation(FieldConstants.BLUE_HUB_POSITION);
+
+        // Detect if we aren't in our alliance zone
+        if ((hubPosition.getX() - robotTranslation.getX()) * (isSidePresentedAsRed() ? -1 : 1) < 0) {
+            // Applies an offset to align to the closest corner of our alliance zone to pass to
+            hubPosition = hubPosition.plus(
+                    new Translation2d(0, Math.signum(robotTranslation.getY() - hubPosition.getY()) * 3));
+        }
 
         return new Rotation2d(Math.atan2(
                         hubPosition.getY() - robotTranslation.getY(), hubPosition.getX() - robotTranslation.getX()))
@@ -177,7 +185,7 @@ public class Swerve extends SubsystemBase {
 
     public void setPose(Pose2d pose) {
         io.setSimulationWorldPose(pose);
-        swerveDrivePoseEstimator.resetPosition(Rotation2d.kZero, getModulePositions(), pose);
+        swerveDrivePoseEstimator.resetPosition(gyro.getRotation(), getModulePositions(), pose);
     }
 
     public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {

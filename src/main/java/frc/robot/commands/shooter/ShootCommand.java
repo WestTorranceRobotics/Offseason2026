@@ -1,12 +1,14 @@
 package frc.robot.commands.shooter;
 
 import static frc.robot.constants.ShooterConstants.*;
-import static frc.robot.constants.VisionConstants.*;
 import static frc.robot.utilities.CustomUnits.RotationsPerMinute;
+import static org.ironmaple.utils.FieldMirroringUtils.toCurrentAllianceTranslation;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.GlobalConstants.FieldConstants;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
@@ -15,6 +17,8 @@ import frc.robot.subsystems.vision.Vision;
 public class ShootCommand extends Command {
     private final Shooter shooter;
     private final Swerve swerveDrive;
+    /* TODO: Add an option to use AprilTags instead of pose estimation for
+    tuning in the shop and potentially as a fallback */
     private final Vision vision;
     private final Hopper hopper;
 
@@ -38,47 +42,32 @@ public class ShootCommand extends Command {
 
     @Override
     public void execute() {
+        /* If we're in the neutral zone or the opposing alliance zone, we're passing
+        to our alliance zone. The distance between the hub and the robot will implicitly
+        be higher, subsidizing the need to apply the position offset to the hub */
+
+        hopper.runHopper();
+
+        Translation2d robotTranslation = swerveDrive.getPose().getTranslation();
+        Translation2d hubPosition = toCurrentAllianceTranslation(FieldConstants.BLUE_HUB_POSITION);
+
+        // Find distance to the hub and get the corresponding RPM for that distance
+        lastDistanceToHub = robotTranslation.getDistance(hubPosition);
+        lastShooterMapRPM = DISTANCE_VS_RPM_MAP.get(lastDistanceToHub);
+
+        // Wait until the swerve is aligned to the hub to shoot
+        if (Math.abs(swerveDrive.getShootingAngle().getDegrees()) < YAW_ACCEPTABLE_ERROR) {
+            shooter.setFlywheelSpeed(RotationsPerMinute.of(lastShooterMapRPM));
+        } else {
+            shooter.stopShooter();
+        }
+
+        // Wait until the shooter's flywheel is up to speed to run the feeder
         if (shooter.shooterIsUpToSpeed()) {
             shooter.runFeeder();
         }
 
-        double hubYaw = vision.getYawOfHub();
-
-        if (hubYaw == 0.0) {
-            if (lastShooterMapRPM > 0 && lastDistanceToHub >= 1.5) {
-                // If our last distance detected was within the range of DISTANCE_VS_RPM_MAP
-                // and we have detected the tag at least once
-                // we keep shooting at that speed so the shooter doesn't stutter
-                // (i.e. if we lose detection for a second or two)
-                shooter.setFlywheelSpeed(RotationsPerMinute.of(lastShooterMapRPM));
-            } else if (vision.getBestTarget() != null
-                    && NEUTRAL_ZONE_APRILTAG_IDS.contains(vision.getBestTarget().getFiducialId())) {
-                // If robot is in the neutral zone / sees a neutral zone Apriltag
-                // we shoot faster to be able to pass to our side
-                shooter.setFlywheelSpeed(RotationsPerMinute.of(PASSING_SHOOTER_RPM));
-            } else {
-                // Otherwise (if we're right up against the hub)
-                // shoot at minimum RPM
-                shooter.setFlywheelSpeed(RotationsPerMinute.of(MINIMUM_SHOOTER_RPM));
-            }
-        } else {
-            if (vision.getDistance(vision.getHubAprilTagID()).isPresent()) {
-                lastDistanceToHub =
-                        vision.getDistance(vision.getHubAprilTagID()).get();
-            }
-
-            SmartDashboard.putNumber("Distance from hub", lastDistanceToHub);
-
-            if (Math.abs(hubYaw) <= YAW_ACCEPTABLE_ERROR) {
-                if (lastDistanceToHub == -1) {
-                    shooter.setFlywheelSpeed(RotationsPerMinute.of(MINIMUM_SHOOTER_RPM));
-                }
-                lastShooterMapRPM = DISTANCE_VS_RPM_MAP.get(lastDistanceToHub);
-                shooter.setFlywheelSpeed(RotationsPerMinute.of(lastShooterMapRPM));
-            } else {
-                shooter.stopShooter();
-            }
-        }
+        SmartDashboard.putNumber("Distance from hub", lastDistanceToHub);
     }
 
     @Override

@@ -12,7 +12,7 @@ public class AlignAndShootCommand extends ParallelCommandGroup {
     public AlignAndShootCommand(
             DoubleSupplier lx, DoubleSupplier ly, Swerve swerveDrive, Shooter shooter, Vision vision, Hopper hopper) {
         addCommands(
-                new AlignCommand(lx, ly, () -> -swerveDrive.getAngleToHub().getDegrees(), swerveDrive),
+                new AlignCommand(lx, ly, () -> -swerveDrive.getShootingAngle().getDegrees(), swerveDrive),
                 new ShootCommand(shooter, swerveDrive, vision, hopper));
     }
 }

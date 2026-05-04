@@ -18,14 +18,13 @@ public final class ShooterConstants {
     public static final double TOLERANCE_TO_RUN_FEEDER = 100;
 
     public static final double YAW_ACCEPTABLE_ERROR = 2;
-    public static final double MINIMUM_SHOOTER_RPM =
-            2700.0; /* 2700 is the RPM value for shooting directly next to the Hub. We fall back to it so we can still
-                    shoot from a known position if vision breaks or is disabled. */
-    public static final double PASSING_SHOOTER_RPM = 3500.0;
+
+    /* 2700 is the RPM value for shooting directly next to the Hub. We fall back to it so we can still
+    shoot from a known position if vision breaks or is disabled. */
+    public static final double MINIMUM_SHOOTER_RPM = 2700.0;
 
     public static final InterpolatingDoubleTreeMap DISTANCE_TO_TOF_MAP = new InterpolatingDoubleTreeMap();
     public static final InterpolatingDoubleTreeMap SHOOTER_MAP = new InterpolatingDoubleTreeMap();
-
     public static final InterpolatingDoubleTreeMap DISTANCE_VS_RPM_MAP = new InterpolatingDoubleTreeMap();
 
     static {

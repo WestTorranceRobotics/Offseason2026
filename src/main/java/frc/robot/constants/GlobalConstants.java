@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
-import org.ironmaple.utils.FieldMirroringUtils;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -32,8 +31,8 @@ public final class GlobalConstants {
     }
 
     public static class FieldConstants {
-        public static final Translation2d HUB_POSITION =
-                FieldMirroringUtils.toCurrentAllianceTranslation(new Translation2d(4.62, 4.035));
+        // Hub translatiion is flipped using MapleSim's FieldMirroringUtils
+        public static final Translation2d BLUE_HUB_POSITION = new Translation2d(4.62, 4.035);
     }
 
     public static class PhysicalRobotConstants {
