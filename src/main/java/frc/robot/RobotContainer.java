@@ -11,6 +11,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.OutakeCommand;
+import frc.robot.commands.intake.PivotDownCommand;
+import frc.robot.commands.intake.PivotUpCommand;
 import frc.robot.commands.shooter.AlignAndShootCommand;
 import frc.robot.commands.shooter.OverrideShootCommand;
 import frc.robot.commands.swerve.AlignCommand;
@@ -110,16 +114,12 @@ public class RobotContainer {
 
     private void registerNamedCommands() {
         NamedCommands.registerCommand(
-                "alignAndShoot",
-                new AlignAndShootCommand(() -> 0, () -> 0, swerveDrive, shooter, vision, hopper).withTimeout(6));
-
-        NamedCommands.registerCommand("startIntake", intake.runOnce(intake::intake));
-
-        NamedCommands.registerCommand("stopIntake", intake.runOnce(intake::stopIntake));
-
-        NamedCommands.registerCommand("pivotDown", intake.sendHoodDownCommand().withTimeout(0.75));
-
-        NamedCommands.registerCommand("pivotUp", intake.sendHoodUpCommand().withTimeout(0.75));
+                "AlignAndShoot",
+                new AlignAndShootCommand(() -> 0, () -> 0, swerveDrive, shooter, intake, hopper, vision));
+        NamedCommands.registerCommand("Intake", new IntakeCommand(intake));
+        NamedCommands.registerCommand("Outake", new OutakeCommand(intake));
+        NamedCommands.registerCommand("PivotDown", new PivotDownCommand(intake).withTimeout(0.75));
+        NamedCommands.registerCommand("PivotUp", new PivotUpCommand(intake).withTimeout(0.75));
     }
 
     private void configureBindings() {
@@ -134,7 +134,7 @@ public class RobotContainer {
         controller
                 .aOrCross()
                 .whileTrue(new AlignAndShootCommand(
-                        controller::getLeftX, controller::getLeftY, swerveDrive, shooter, vision, hopper));
+                        controller::getLeftX, controller::getLeftY, swerveDrive, shooter, intake, hopper, vision));
 
         // align button mapping
         controller
@@ -142,21 +142,21 @@ public class RobotContainer {
                 .whileTrue(
                         new AlignCommand(controller::getLeftX, controller::getLeftY, vision::getYawOfHub, swerveDrive));
 
-        controller.xOrSquare().toggleOnTrue(intake.intakeCommand());
-        controller.yOrTriangle().toggleOnTrue(intake.outtakeCommand());
+        controller.xOrSquare().toggleOnTrue(new IntakeCommand(intake));
+        controller.yOrTriangle().toggleOnTrue(new OutakeCommand(intake));
 
-        controller.dPadUp().whileTrue(intake.sendHoodUpCommand());
-        controller.dPadDown().whileTrue(intake.sendHoodDownCommand());
+        controller.dPadUp().whileTrue(new PivotUpCommand(intake));
+        controller.dPadDown().whileTrue(new PivotDownCommand(intake));
 
         overrideController
                 .aOrCross()
-                .whileTrue(new OverrideShootCommand(shooter, hopper, ShooterConstants.MINIMUM_SHOOTER_RPM));
+                .whileTrue(new OverrideShootCommand(shooter, intake, hopper, ShooterConstants.MINIMUM_SHOOTER_RPM));
 
-        overrideController.bOrCircle().whileTrue(new OverrideShootCommand(shooter, hopper, 3200.0));
+        overrideController.bOrCircle().whileTrue(new OverrideShootCommand(shooter, intake, hopper, 3200.0));
 
-        overrideController.xOrSquare().whileTrue(new OverrideShootCommand(shooter, hopper, 3700.0));
+        overrideController.xOrSquare().whileTrue(new OverrideShootCommand(shooter, intake, hopper, 3700.0));
 
-        overrideController.yOrTriangle().whileTrue(new OverrideShootCommand(shooter, hopper, 4200.0));
+        overrideController.yOrTriangle().whileTrue(new OverrideShootCommand(shooter, intake, hopper, 4200.0));
     }
 
     /**

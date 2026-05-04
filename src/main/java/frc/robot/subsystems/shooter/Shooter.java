@@ -8,8 +8,8 @@ import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
@@ -41,17 +41,6 @@ public class Shooter extends SubsystemBase {
         return Math.abs(this.actualRPM - this.targetRPM) <= TOLERANCE_TO_RUN_FEEDER;
     }
 
-    public Command runShooterCommand(AngularVelocity velocity) {
-        return this.runEnd(
-                () -> {
-                    this.setFlywheelSpeed(velocity);
-                    if (this.shooterIsUpToSpeed()) {
-                        io.setFeederVoltage(Volts.of(FEEDER_VOLTAGE));
-                    }
-                },
-                this::stopShooter);
-    }
-
     public void setFlywheelSpeed(AngularVelocity velocity) {
         this.targetRPM = velocity.in(RotationsPerMinute);
         bangbang.setSetpoint(targetRPM);
@@ -59,10 +48,6 @@ public class Shooter extends SubsystemBase {
                 + 0.9 * feedforward.calculate(targetRPM);
 
         io.setFlywheelVoltage(Volts.of(voltage));
-    }
-
-    public Command stopShooterCommand() {
-        return this.runOnce(this::stopShooter);
     }
 
     public void stopShooter() {
@@ -76,19 +61,7 @@ public class Shooter extends SubsystemBase {
         io.setFeederVoltage(Volts.of(0));
     }
 
-    public Command runFeederCommand() {
-        return this.startEnd(
-                () -> {
-                    io.setFeederVoltage(Volts.of(FEEDER_VOLTAGE));
-                },
-                () -> this.stopFeeder());
-    }
-
-    public void runFeeder() {
-        io.setFeederVoltage(Volts.of(FEEDER_VOLTAGE));
-    }
-
-    public Command stopFeederCommand() {
-        return this.runOnce(() -> this.stopFeeder());
+    public void setFeederVoltage(Voltage voltage) {
+        io.setFeederVoltage(voltage);
     }
 }

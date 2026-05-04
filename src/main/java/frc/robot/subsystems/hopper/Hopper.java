@@ -1,11 +1,10 @@
 package frc.robot.subsystems.hopper;
 
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.constants.HopperConstants.*;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.CustomUnits;
 
@@ -28,12 +27,8 @@ public class Hopper extends SubsystemBase {
         return CustomUnits.RotationsPerMinute.of(actualRPM);
     }
 
-    public Command runHopperCommand() {
-        return this.runEnd(this::runHopper, this::stopHopper);
-    }
-
-    public void runHopper() {
-        io.setRollerVoltage(Volts.of(HOPPER_VOLTAGE));
+    public void setHopperVoltage(Voltage voltage) {
+        io.setRollerVoltage(voltage);
     }
 
     public void stopHopper() {

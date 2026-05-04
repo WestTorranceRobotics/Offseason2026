@@ -67,7 +67,7 @@ public class IntakeIOSim implements IntakeIO {
     }
 
     @Override
-    public double getHoodRPM() {
+    public double getPivotRPM() {
         return Units.radiansPerSecondToRotationsPerMinute(pivotSim.getVelocityRadPerSec());
     }
 
@@ -77,7 +77,7 @@ public class IntakeIOSim implements IntakeIO {
     }
 
     @Override
-    public void setHoodVoltage(Voltage voltage) {
+    public void setPivotVoltage(Voltage voltage) {
         pivotMotor.setVoltage(voltage);
     }
 

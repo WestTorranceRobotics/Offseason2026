@@ -7,11 +7,11 @@ import edu.wpi.first.units.measure.Voltage;
 public interface IntakeIO {
     public double getIntakeRPM();
 
-    public double getHoodRPM();
+    public double getPivotRPM();
 
     public void setIntakeVoltage(Voltage voltage);
 
-    public void setHoodVoltage(Voltage voltage);
+    public void setPivotVoltage(Voltage voltage);
 
     public String getIntakeLocation();
 

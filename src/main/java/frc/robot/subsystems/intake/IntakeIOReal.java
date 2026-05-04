@@ -42,7 +42,7 @@ public class IntakeIOReal implements IntakeIO {
     }
 
     @Override
-    public double getHoodRPM() {
+    public double getPivotRPM() {
         return pivotMotor.getEncoder().getVelocity();
     }
 
@@ -52,7 +52,7 @@ public class IntakeIOReal implements IntakeIO {
     }
 
     @Override
-    public void setHoodVoltage(Voltage voltage) {
+    public void setPivotVoltage(Voltage voltage) {
         pivotMotor.setVoltage(voltage);
     }
 

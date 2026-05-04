@@ -7,25 +7,32 @@
         {
           "type": "named",
           "data": {
-            "name": "pivotDown"
+            "name": "PivotDown"
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "backward from middle"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "backward from middle"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "startIntake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "alignAndShoot"
+            "name": "AlignAndShoot"
           }
         }
       ]
