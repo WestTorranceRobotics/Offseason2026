@@ -23,12 +23,12 @@ public class IntakeIOSim implements IntakeIO {
     private final SparkMaxSim intakeMotorSim;
     private final SparkMaxSim pivotMotorSim;
 
+    // TODO: Find MOI (moment of inertia)
     private final FlywheelSim rollerSim = new FlywheelSim(
             LinearSystemId.createFlywheelSystem(DCMotor.getNEO(1), 0.00062156662, 1), DCMotor.getNEO(1));
 
     private final SingleJointedArmSim pivotSim = new SingleJointedArmSim(
-            // TODO: Find moment of inertia ("JKgSquaredMeters")
-            LinearSystemId.createSingleJointedArmSystem(DCMotor.getNEO(1), 11.8438079981694, 1),
+            LinearSystemId.createSingleJointedArmSystem(DCMotor.getNEO(1), 11.8438079981694, 75),
             DCMotor.getNEO(1),
             1.0 / 125,
             6,
@@ -50,6 +50,7 @@ public class IntakeIOSim implements IntakeIO {
     private void updateSim() {
         rollerSim.setInput(intakeMotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
         rollerSim.update(0.02);
+
         pivotSim.setInput(pivotMotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
         pivotSim.update(0.02);
 

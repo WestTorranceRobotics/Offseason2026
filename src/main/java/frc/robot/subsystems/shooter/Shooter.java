@@ -29,6 +29,7 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs();
+        actualRPM = io.getFlywheelRPM();
         SmartDashboard.putNumber("Shooter RPM", actualRPM);
         SmartDashboard.putNumber("Target Shooter RPM", targetRPM);
         SmartDashboard.putNumber("Feeder RPM", io.getFeederRPM());

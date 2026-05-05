@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 
 public class ShooterIOSim implements ShooterIO {
-    private final SparkMax feederMotor = new SparkMax(FEEDER_MOTOR_ID, MotorType.kBrushless); // dummy
+    private final SparkMax feederMotor = new SparkMax(FEEDER_MOTOR_ID, MotorType.kBrushless);
     private final SparkMax flywheelMotor = new SparkMax(LAUNCHER_MOTOR_1_ID, MotorType.kBrushless);
     private final SparkMax flywheelMotorInverted = new SparkMax(LAUNCHER_MOTOR_2_ID, MotorType.kBrushless);
 
@@ -21,8 +21,9 @@ public class ShooterIOSim implements ShooterIO {
     private final SparkMaxSim launcherMotorLeaderSim;
     private final SparkMaxSim launcherMotorFollowerSim;
 
+    // TODO: Find MOI (moment of inertia)
     private final FlywheelSim flywheelSim = new FlywheelSim(
-            LinearSystemId.createFlywheelSystem(DCMotor.getNEO(3), 0.00062156662, 1), DCMotor.getNEO(3));
+            LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00062156662, 1), DCMotor.getNEO(2));
 
     private final FlywheelSim feederSim = new FlywheelSim(
             LinearSystemId.createFlywheelSystem(DCMotor.getNEO(1), 0.00062156662, 1), DCMotor.getNEO(1));

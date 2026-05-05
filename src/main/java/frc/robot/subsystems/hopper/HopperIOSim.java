@@ -16,8 +16,9 @@ public class HopperIOSim implements HopperIO {
     private final SparkMax hopperMotor = new SparkMax(HOPPER_MOTOR_ID, MotorType.kBrushless);
     private final SparkMaxSim hopperMotorSim;
 
+    // TODO: Find MOI (moment of inertia)
     private final FlywheelSim flywheelSim = new FlywheelSim(
-            LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00062156662, 1), DCMotor.getNEO(2));
+            LinearSystemId.createFlywheelSystem(DCMotor.getNEO(1), 0.00062156662, 1), DCMotor.getNEO(1));
 
     public HopperIOSim() {
         hopperMotorSim = new SparkMaxSim(hopperMotor, DCMotor.getNEO(1));

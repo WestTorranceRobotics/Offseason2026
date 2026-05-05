@@ -10,6 +10,6 @@ public class IntakeConstants {
     public static final double INTAKE_VOLTAGE = 11;
     public static final double OUTTAKE_VOLTAGE = -11;
 
-    public static final double PIVOT_DOWN_VOLTAGE = 5;
-    public static final double PIVOT_UP_VOLTAGE = -4;
+    public static final double PIVOT_UP_VOLTAGE = 4;
+    public static final double PIVOT_DOWN_VOLTAGE = -5;
 }

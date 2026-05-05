@@ -26,7 +26,6 @@ public class IntakeIOReal implements IntakeIO {
         SparkMaxConfig pivotConfig = new SparkMaxConfig();
         pivotConfig.smartCurrentLimit(PIVOT_MOTOR_CURRENT_LIMIT);
         pivotConfig.idleMode(IdleMode.kBrake);
-        pivotConfig.inverted(true);
         pivotConfig.encoder.positionConversionFactor(2 * Math.PI); // Converts from rotations to radians
         pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
