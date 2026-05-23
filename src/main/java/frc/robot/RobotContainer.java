@@ -4,52 +4,44 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
 import static frc.robot.constants.GlobalConstants.*;
 import static frc.robot.constants.ShooterConstants.YAW_ACCEPTABLE_ERROR;
 import static frc.robot.utilities.CustomUnits.RotationsPerMinute;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.Shooter.ShootCommand;
-import frc.robot.commands.SwerveDrive.AutonomousPeriodicCommand;
-import frc.robot.commands.SwerveDrive.DefaultJoystickCommand;
-import frc.robot.constants.SwerveDriveConstants.RealRobotConstants;
-import frc.robot.constants.SwerveDriveConstants.RealRobotConstants.RealModuleConstants;
-import frc.robot.constants.SwerveDriveConstants.SimulatedControlSystemConstants.SimulatedModuleConstants;
-import frc.robot.subsystems.Hopper.HopperIO;
-import frc.robot.subsystems.Hopper.HopperIOReal;
-import frc.robot.subsystems.Hopper.HopperIOSim;
-import frc.robot.subsystems.Intake.IntakeIO;
-import frc.robot.subsystems.Intake.IntakeIOReal;
-import frc.robot.subsystems.Intake.IntakeIOSim;
-import frc.robot.subsystems.Shooter.ShooterIO;
-import frc.robot.subsystems.Shooter.ShooterIOReal;
-import frc.robot.subsystems.Shooter.ShooterIOSim;
-import frc.robot.subsystems.SwerveDrive.SwerveDrive;
-import frc.robot.subsystems.SwerveDrive.SwerveDriveConfigurator;
-import frc.robot.subsystems.hardware.gyroscope.GyroIOPigeon2;
-import frc.robot.subsystems.hardware.gyroscope.GyroIOSim;
-import frc.robot.subsystems.hardware.module.ModuleIOReal;
-import frc.robot.subsystems.hardware.module.ModuleIOSim;
-import frc.robot.subsystems.hardware.vision.VisionIO;
-import frc.robot.subsystems.hardware.vision.VisionIOReal;
-import frc.robot.subsystems.hardware.vision.VisionIOSim;
+import frc.robot.commands.shooter.ShootCommand;
+import frc.robot.commands.swerve.AutonomousPeriodicCommand;
+import frc.robot.commands.swerve.DefaultJoystickCommand;
+import frc.robot.constants.GlobalConstants.OperatorConstants;
+import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.subsystems.hopper.HopperIOReal;
+import frc.robot.subsystems.hopper.HopperIOSim;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIOReal;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIOReal;
+import frc.robot.subsystems.shooter.ShooterIOSim;
+import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveConfigurator;
+import frc.robot.subsystems.swerve.SwerveIOReal;
+import frc.robot.subsystems.swerve.SwerveIOSim;
+import frc.robot.subsystems.swerve.gyroscope.GyroIOReal;
+import frc.robot.subsystems.swerve.gyroscope.GyroIOSim;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIOReal;
+import frc.robot.subsystems.vision.VisionIOSim;
 import frc.robot.utilities.controller.Controller;
 import frc.robot.utilities.controller.DualShock4Controller;
 import frc.robot.utilities.controller.LogitechController;
-import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -58,20 +50,20 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
  * the {@link Robot}
  * periodic methods (other than the scheduler calls). Instead, the structure of
  * the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
+ * s, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-    private final SwerveDrive swerveDrive;
-    private final ShooterIO shooterSubsystem;
-    private final IntakeIO intakeSubsystem;
-    private final HopperIO hopperSubsystem;
+    private final Swerve swerveDrive;
+    private final Shooter shooter;
+    private final Intake intake;
+    private final Hopper hopper;
 
     private final Controller controller;
     private final Controller overrideController;
 
     public static SwerveDriveSimulation3D swerveDriveSimulation;
 
-    public static VisionIO visionIO;
+    public static Vision vision;
 
     private final SendableChooser<Double> shooterSpeedChooser = new SendableChooser<>();
     private SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -80,8 +72,6 @@ public class RobotContainer {
      * Registers all important robot code, e.g. swerve, path planner, controls
      */
     public RobotContainer() {
-        SwerveDriveConfigurator swerveDriveConfigurator;
-
         for (double startingRPM = 2500; startingRPM < 4600; startingRPM += 50) {
             shooterSpeedChooser.addOption(String.format("%s RPM", startingRPM), startingRPM);
         }
@@ -89,90 +79,25 @@ public class RobotContainer {
         SmartDashboard.putData("Run Shooter at X RPM:", shooterSpeedChooser);
 
         if (Robot.isReal()) {
-            // Real drive train
-            var robotConstants = new SwerveDriveConfigurator.SwerveDriveRobotConstants(
-                    Kilograms.of(35),
-                    Inches.of(30),
-                    Inches.of(24.5),
-                    Inches.of(2.5),
-                    Inches.of(2),
-                    RealRobotConstants.PIGEON2_ID);
+            swerveDrive = new Swerve(new SwerveIOReal(), new GyroIOReal(), SwerveConfigurator.createRealModules());
 
-            swerveDriveConfigurator = new SwerveDriveConfigurator(
-                    robotConstants, new SwerveDriveConfigurator.SwerveDriveModuleConstants[] {
-                        RealModuleConstants.FLModuleConstants,
-                        RealModuleConstants.FRModuleConstants,
-                        RealModuleConstants.BLModuleConstants,
-                        RealModuleConstants.BRModuleConstants
-                    });
-
-            swerveDrive = new SwerveDrive(
-                    new GyroIOPigeon2(robotConstants.pigeonID),
-                    new ModuleIOReal(
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.FRONT_LEFT, swerveDriveConfigurator),
-                    new ModuleIOReal(
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.FRONT_RIGHT, swerveDriveConfigurator),
-                    new ModuleIOReal(
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.BACK_LEFT, swerveDriveConfigurator),
-                    new ModuleIOReal(
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.BACK_RIGHT, swerveDriveConfigurator));
-
-            shooterSubsystem = new ShooterIOReal();
-            intakeSubsystem = new IntakeIOReal();
-            hopperSubsystem = new HopperIOReal();
-            visionIO = new VisionIOReal(swerveDrive::addVisionMeasurement);
+            shooter = new Shooter(new ShooterIOReal());
+            intake = new Intake(new IntakeIOReal());
+            hopper = new Hopper(new HopperIOReal());
+            vision = new Vision(new VisionIOReal(), swerveDrive::addVisionMeasurement);
         } else {
-            // TODO add constant for drive base length
-            swerveDriveSimulation = new SwerveDriveSimulation3D(
-                    DriveTrainSimulationConfig.Default()
-                            .withRobotMass(Pounds.of(75))
-                            .withSwerveModule(COTS.ofSwerveX2(
-                                    DCMotor.getKrakenX60(1),
-                                    DCMotor.getNEO(1),
-                                    COTS.WHEELS.SLS_PRINTED_WHEELS.cof,
-                                    2,
-                                    11))
-                            .withTrackLengthTrackWidth(Inches.of(30 - 5), Inches.of(24.5 - 5))
-                            .withBumperSize(Inches.of(31), Inches.of(31)),
-                    new Pose2d(2, 7, Rotation2d.kZero));
+            SwerveIOSim swerveDriveIOSim = new SwerveIOSim();
+            swerveDriveSimulation = swerveDriveIOSim.getSimulation();
 
-            SwerveDriveConfigurator.SwerveDriveRobotConstants robotConstants =
-                    new SwerveDriveConfigurator.SwerveDriveRobotConstants(
-                            Pounds.of(75), Inches.of(30), Inches.of(24.5), Inches.of(2.5), Inches.of(2), 0);
-
-            swerveDriveConfigurator = new SwerveDriveConfigurator(
-                    robotConstants, new SwerveDriveConfigurator.SwerveDriveModuleConstants[] {
-                        SimulatedModuleConstants.FLModuleConstants,
-                        SimulatedModuleConstants.FRModuleConstants,
-                        SimulatedModuleConstants.BLModuleConstants,
-                        SimulatedModuleConstants.BRModuleConstants
-                    });
-
-            // TODO change this to not assume square drivebase
-            swerveDrive = new SwerveDrive(
+            swerveDrive = new Swerve(
+                    swerveDriveIOSim,
                     new GyroIOSim(swerveDriveSimulation.getGyroSimulation()),
-                    new ModuleIOSim(
-                            swerveDriveSimulation.getModules()[0],
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.FRONT_LEFT,
-                            swerveDriveConfigurator),
-                    new ModuleIOSim(
-                            swerveDriveSimulation.getModules()[1],
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.FRONT_RIGHT,
-                            swerveDriveConfigurator),
-                    new ModuleIOSim(
-                            swerveDriveSimulation.getModules()[2],
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.BACK_LEFT,
-                            swerveDriveConfigurator),
-                    new ModuleIOSim(
-                            swerveDriveSimulation.getModules()[3],
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.BACK_RIGHT,
-                            swerveDriveConfigurator));
+                    SwerveConfigurator.createSimModules(swerveDriveSimulation));
 
-            swerveDriveSimulation.registerWithArena(Robot.arena, new Pose2d(2, 7, Rotation2d.kZero));
-            shooterSubsystem = new ShooterIOSim();
-            intakeSubsystem = new IntakeIOSim();
-            hopperSubsystem = new HopperIOSim();
-            visionIO = new VisionIOSim(swerveDrive::addVisionMeasurement);
+            shooter = new Shooter(new ShooterIOSim());
+            intake = new Intake(new IntakeIOSim());
+            hopper = new Hopper(new HopperIOSim());
+            vision = new Vision(new VisionIOSim(), swerveDrive::addVisionMeasurement);
         }
 
         controller = new DualShock4Controller(OperatorConstants.DRIVER_CONTROLLER_PORT);
@@ -198,7 +123,7 @@ public class RobotContainer {
                         })
                 .until(() -> {
                     var apriltagId = isAllianceBlue() ? 25 : 10;
-                    var yaw = visionIO.getTX(apriltagId);
+                    var yaw = vision.getTX(apriltagId);
                     if (yaw.isEmpty()) {
                         SmartDashboard.putNumber("Yaw from target", -1);
                         return true; // Break because no AprilTag was found
@@ -220,17 +145,15 @@ public class RobotContainer {
                         Commands.run(() -> {
                             swerveDrive.drive(new ChassisSpeeds(), true);
                         }),
-                        new ShootCommand(shooterSubsystem, swerveDrive, visionIO, hopperSubsystem).withTimeout(6)));
+                        new ShootCommand(shooter, swerveDrive, vision, hopper).withTimeout(6)));
 
-        NamedCommands.registerCommand("startIntake", intakeSubsystem.runOnce(intakeSubsystem::intake));
+        NamedCommands.registerCommand("startIntake", intake.runOnce(intake::intake));
 
-        NamedCommands.registerCommand("stopIntake", intakeSubsystem.runOnce(intakeSubsystem::stopIntake));
+        NamedCommands.registerCommand("stopIntake", intake.runOnce(intake::stopIntake));
 
-        NamedCommands.registerCommand(
-                "pivotDown", intakeSubsystem.sendHoodDownCommand().withTimeout(0.75));
+        NamedCommands.registerCommand("pivotDown", intake.sendHoodDownCommand().withTimeout(0.75));
 
-        NamedCommands.registerCommand(
-                "pivotUp", intakeSubsystem.sendHoodUpCommand().withTimeout(0.75));
+        NamedCommands.registerCommand("pivotUp", intake.sendHoodUpCommand().withTimeout(0.75));
     }
 
     private void configureBindings() {
@@ -238,57 +161,53 @@ public class RobotContainer {
         controller.zero().onTrue(Commands.runOnce(this::zeroHeading));
 
         // shooter button mapping
-        controller.aOrCross().whileTrue(new ShootCommand(shooterSubsystem, swerveDrive, visionIO, hopperSubsystem));
+        controller.aOrCross().whileTrue(new ShootCommand(shooter, swerveDrive, vision, hopper));
 
         // align button mapping
         controller
                 .bOrCircle()
                 .whileTrue(Commands.run(() -> {
-                    if (visionIO.getBestTarget() == null) return;
+                    if (vision.getBestTarget() == null) return;
                     // align robot to best AprilTag
                     //     swerveDrive.setAlignStatus(
                     //             true,
-                    //             visionIO.getTX(visionIO.getBestTarget().getFiducialId())
+                    //             vision.getTX(vision.getBestTarget().getFiducialId())
                     //                     .orElse(null));
                     int hubAprilTagID = isAllianceBlue() ? 25 : 10;
-                    if (visionIO.getTX(hubAprilTagID).orElse(null) != null) {
+                    if (vision.getTX(hubAprilTagID).orElse(null) != null) {
                         swerveDrive.setAlignStatus(
-                                true, visionIO.getTX(hubAprilTagID).get());
+                                true, vision.getTX(hubAprilTagID).get());
                     }
                 }))
                 .onFalse(Commands.run(() -> {
                     swerveDrive.setAlignStatus(false, 0);
                 }));
 
-        controller.xOrSquare().toggleOnTrue(intakeSubsystem.intakeCommand());
-        controller.yOrTriangle().toggleOnTrue(intakeSubsystem.outtakeCommand());
+        controller.xOrSquare().toggleOnTrue(intake.intakeCommand());
+        controller.yOrTriangle().toggleOnTrue(intake.outtakeCommand());
 
-        controller.dPadUp().whileTrue(intakeSubsystem.sendHoodUpCommand());
-        controller.dPadDown().whileTrue(intakeSubsystem.sendHoodDownCommand());
+        controller.dPadUp().whileTrue(intake.sendHoodUpCommand());
+        controller.dPadDown().whileTrue(intake.sendHoodDownCommand());
 
         overrideController
                 .aOrCross()
                 .whileTrue(Commands.parallel(
-                        hopperSubsystem.runHopperCommand(),
-                        shooterSubsystem.runShooterCommand(RotationsPerMinute.of(2700.0))));
+                        hopper.runHopperCommand(), shooter.runShooterCommand(RotationsPerMinute.of(2700.0))));
 
         overrideController
                 .bOrCircle()
                 .whileTrue(Commands.parallel(
-                        hopperSubsystem.runHopperCommand(),
-                        shooterSubsystem.runShooterCommand(RotationsPerMinute.of(3850.0))));
+                        hopper.runHopperCommand(), shooter.runShooterCommand(RotationsPerMinute.of(3850.0))));
 
         overrideController
                 .xOrSquare()
                 .whileTrue(Commands.parallel(
-                        hopperSubsystem.runHopperCommand(),
-                        shooterSubsystem.runShooterCommand(RotationsPerMinute.of(4316.6667))));
+                        hopper.runHopperCommand(), shooter.runShooterCommand(RotationsPerMinute.of(4316.6667))));
 
         overrideController
                 .yOrTriangle()
                 .whileTrue(Commands.parallel(
-                        hopperSubsystem.runHopperCommand(),
-                        shooterSubsystem.runShooterCommand(RotationsPerMinute.of(4767.0))));
+                        hopper.runHopperCommand(), shooter.runShooterCommand(RotationsPerMinute.of(4767.0))));
     }
 
     /**

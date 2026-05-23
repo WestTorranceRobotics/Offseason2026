@@ -1,6 +1,6 @@
 package frc.robot.constants;
 
-import frc.robot.subsystems.SwerveDrive.SwerveDriveConfigurator;
+import frc.robot.subsystems.swerve.SwerveConfigurator;
 
 public final class SwerveDriveConstants {
     public static final double MAX_TRANSLATION_SPEED = 4;
@@ -55,9 +55,9 @@ public final class SwerveDriveConstants {
         public static final double kDRotation = 0.59364;
 
         public static class RealModuleConstants {
-            public static SwerveDriveConfigurator.SwerveDriveModuleConstants FLModuleConstants =
-                    new SwerveDriveConfigurator.SwerveDriveModuleConstants(
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.FRONT_LEFT,
+            public static SwerveConfigurator.SwerveDriveModuleConstants FLModuleConstants =
+                    new SwerveConfigurator.SwerveDriveModuleConstants(
+                            SwerveConfigurator.SwerveModuleCornerPosition.FRONT_LEFT,
                             RealRobotConstants.FL_CANCODER_ID,
                             RealRobotConstants.FL_DRIVE_MOTOR_ID,
                             RealRobotConstants.FL_AZIMUTH_MOTOR_ID,
@@ -74,26 +74,26 @@ public final class SwerveDriveConstants {
                             3,
                             false,
                             1 / 6.2);
-            public static SwerveDriveConfigurator.SwerveDriveModuleConstants FRModuleConstants =
-                    new SwerveDriveConfigurator.SwerveDriveModuleConstants(
+            public static SwerveConfigurator.SwerveDriveModuleConstants FRModuleConstants =
+                    new SwerveConfigurator.SwerveDriveModuleConstants(
                             FLModuleConstants,
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.FRONT_RIGHT,
+                            SwerveConfigurator.SwerveModuleCornerPosition.FRONT_RIGHT,
                             RealRobotConstants.FR_CANCODER_ID,
                             RealRobotConstants.FR_DRIVE_MOTOR_ID,
                             RealRobotConstants.FR_AZIMUTH_MOTOR_ID,
                             RealRobotConstants.FR_CANCODER_OFFSET);
-            public static SwerveDriveConfigurator.SwerveDriveModuleConstants BLModuleConstants =
-                    new SwerveDriveConfigurator.SwerveDriveModuleConstants(
+            public static SwerveConfigurator.SwerveDriveModuleConstants BLModuleConstants =
+                    new SwerveConfigurator.SwerveDriveModuleConstants(
                             FLModuleConstants,
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.BACK_LEFT,
+                            SwerveConfigurator.SwerveModuleCornerPosition.BACK_LEFT,
                             RealRobotConstants.BL_CANCODER_ID,
                             RealRobotConstants.BL_DRIVE_MOTOR_ID,
                             RealRobotConstants.BL_AZIMUTH_MOTOR_ID,
                             RealRobotConstants.BL_CANCODER_OFFSET);
-            public static SwerveDriveConfigurator.SwerveDriveModuleConstants BRModuleConstants =
-                    new SwerveDriveConfigurator.SwerveDriveModuleConstants(
+            public static SwerveConfigurator.SwerveDriveModuleConstants BRModuleConstants =
+                    new SwerveConfigurator.SwerveDriveModuleConstants(
                             FLModuleConstants,
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.BACK_RIGHT,
+                            SwerveConfigurator.SwerveModuleCornerPosition.BACK_RIGHT,
                             RealRobotConstants.BR_CANCODER_ID,
                             RealRobotConstants.BR_DRIVE_MOTOR_ID,
                             RealRobotConstants.BR_AZIMUTH_MOTOR_ID,
@@ -115,9 +115,9 @@ public final class SwerveDriveConstants {
         public static final double kDSteer = 0.59364;
 
         public static class SimulatedModuleConstants {
-            public static SwerveDriveConfigurator.SwerveDriveModuleConstants FLModuleConstants =
-                    new SwerveDriveConfigurator.SwerveDriveModuleConstants(
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.FRONT_LEFT,
+            public static SwerveConfigurator.SwerveDriveModuleConstants FLModuleConstants =
+                    new SwerveConfigurator.SwerveDriveModuleConstants(
+                            SwerveConfigurator.SwerveModuleCornerPosition.FRONT_LEFT,
                             0,
                             0,
                             0,
@@ -134,30 +134,15 @@ public final class SwerveDriveConstants {
                             2,
                             false,
                             1 / 6.2);
-            public static SwerveDriveConfigurator.SwerveDriveModuleConstants FRModuleConstants =
-                    new SwerveDriveConfigurator.SwerveDriveModuleConstants(
-                            FLModuleConstants,
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.FRONT_RIGHT,
-                            0,
-                            0,
-                            0,
-                            0);
-            public static SwerveDriveConfigurator.SwerveDriveModuleConstants BLModuleConstants =
-                    new SwerveDriveConfigurator.SwerveDriveModuleConstants(
-                            FLModuleConstants,
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.BACK_LEFT,
-                            0,
-                            0,
-                            0,
-                            0);
-            public static SwerveDriveConfigurator.SwerveDriveModuleConstants BRModuleConstants =
-                    new SwerveDriveConfigurator.SwerveDriveModuleConstants(
-                            FLModuleConstants,
-                            SwerveDriveConfigurator.SwerveModuleCornerPosition.BACK_RIGHT,
-                            0,
-                            0,
-                            0,
-                            0);
+            public static SwerveConfigurator.SwerveDriveModuleConstants FRModuleConstants =
+                    new SwerveConfigurator.SwerveDriveModuleConstants(
+                            FLModuleConstants, SwerveConfigurator.SwerveModuleCornerPosition.FRONT_RIGHT, 0, 0, 0, 0);
+            public static SwerveConfigurator.SwerveDriveModuleConstants BLModuleConstants =
+                    new SwerveConfigurator.SwerveDriveModuleConstants(
+                            FLModuleConstants, SwerveConfigurator.SwerveModuleCornerPosition.BACK_LEFT, 0, 0, 0, 0);
+            public static SwerveConfigurator.SwerveDriveModuleConstants BRModuleConstants =
+                    new SwerveConfigurator.SwerveDriveModuleConstants(
+                            FLModuleConstants, SwerveConfigurator.SwerveModuleCornerPosition.BACK_RIGHT, 0, 0, 0, 0);
         }
     }
 }

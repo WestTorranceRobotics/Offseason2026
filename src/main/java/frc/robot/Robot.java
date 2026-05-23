@@ -92,9 +92,7 @@ public class Robot extends TimedRobot {
 
     /** This function is called periodically during operator control. */
     @Override
-    public void teleopPeriodic() {
-        RobotContainer.visionIO.tick();
-    }
+    public void teleopPeriodic() {}
 
     @Override
     public void testInit() {
@@ -113,8 +111,6 @@ public class Robot extends TimedRobot {
     /** This function is called periodically whilst in simulation. */
     @Override
     public void simulationPeriodic() {
-        RobotContainer.visionIO.tick();
-
         arena.simulationPeriodic();
     }
 }
