@@ -8,10 +8,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
 
-@Logged
 public class IntakeIOReal implements IntakeIO {
     private final SparkMax intakeMotor = new SparkMax(INTAKE_MOTOR_ID, MotorType.kBrushless);
     private final SparkMax pivotMotor = new SparkMax(PIVOT_MOTOR_ID, MotorType.kBrushless);
@@ -36,13 +34,14 @@ public class IntakeIOReal implements IntakeIO {
     }
 
     @Override
-    public double getIntakeRPM() {
-        return intakeMotor.getEncoder().getVelocity();
-    }
-
-    @Override
-    public double getPivotRPM() {
-        return pivotMotor.getEncoder().getVelocity();
+    public void updateInputs(IntakeIOInputs inputs) {
+        inputs.intakeRPM = intakeMotor.getEncoder().getVelocity();
+        inputs.pivotRPM = pivotMotor.getEncoder().getVelocity();
+        inputs.pivotPosition = pivotMotor.getEncoder().getPosition() <= PIVOT_ENCODER_POSITION_DEADBAND
+                ? "DOWN"
+                : (pivotMotor.getEncoder().getPosition() >= (Math.PI / 2 - PIVOT_ENCODER_POSITION_DEADBAND)
+                        ? "UP"
+                        : "IN BETWEEN");
     }
 
     @Override
@@ -53,17 +52,5 @@ public class IntakeIOReal implements IntakeIO {
     @Override
     public void setPivotVoltage(Voltage voltage) {
         pivotMotor.setVoltage(voltage);
-    }
-
-    @Override
-    public String getIntakeLocation() {
-        var deadband = 0.2;
-        if (pivotMotor.getEncoder().getPosition() <= (0 + deadband)) {
-            return "DOWN";
-        } else if (pivotMotor.getEncoder().getPosition() >= (Math.PI / 2 - deadband)) {
-            return "UP";
-        } else {
-            return "IN BETWEEN";
-        }
     }
 }

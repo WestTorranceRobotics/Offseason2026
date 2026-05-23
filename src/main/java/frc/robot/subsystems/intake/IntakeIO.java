@@ -1,19 +1,20 @@
 package frc.robot.subsystems.intake;
 
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
+import org.littletonrobotics.junction.AutoLog;
 
-@Logged
 public interface IntakeIO {
-    public double getIntakeRPM();
+    @AutoLog
+    public class IntakeIOInputs {
+        public double intakeRPM = 0.0;
+        public double pivotRPM = 0.0;
 
-    public double getPivotRPM();
+        public String pivotPosition = "UP";
+    }
 
     public void setIntakeVoltage(Voltage voltage);
 
     public void setPivotVoltage(Voltage voltage);
 
-    public String getIntakeLocation();
-
-    public default void updateInputs() {}
+    public default void updateInputs(IntakeIOInputs inputs) {}
 }

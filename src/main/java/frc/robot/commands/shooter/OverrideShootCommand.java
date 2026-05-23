@@ -1,8 +1,8 @@
 package frc.robot.commands.shooter;
 
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.ShooterConstants.FEEDER_VOLTAGE;
-import static frc.robot.utilities.CustomUnits.RotationsPerMinute;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.hopper.HopperCommand;
@@ -16,7 +16,7 @@ public class OverrideShootCommand extends ParallelCommandGroup {
         addCommands(
                 shooter.runEnd(
                         () -> {
-                            shooter.setFlywheelSpeed(RotationsPerMinute.of(targetRPM));
+                            shooter.setFlywheelSpeed(RPM.of(targetRPM));
                             shooter.setFeederVoltage(Volts.of(FEEDER_VOLTAGE));
                         },
                         () -> {

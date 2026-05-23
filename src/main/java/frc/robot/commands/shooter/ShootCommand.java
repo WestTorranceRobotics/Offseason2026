@@ -1,8 +1,8 @@
 package frc.robot.commands.shooter;
 
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.ShooterConstants.*;
-import static frc.robot.utilities.CustomUnits.RotationsPerMinute;
 import static org.ironmaple.utils.FieldMirroringUtils.toCurrentAllianceTranslation;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -51,7 +51,7 @@ public class ShootCommand extends Command {
 
         // Wait until the swerve is aligned to the hub to shoot
         if (Math.abs(swerveDrive.getShootingAngle().getDegrees()) < YAW_ACCEPTABLE_ERROR) {
-            shooter.setFlywheelSpeed(RotationsPerMinute.of(lastShooterMapRPM));
+            shooter.setFlywheelSpeed(RPM.of(lastShooterMapRPM));
         } else {
             shooter.stopShooter();
         }

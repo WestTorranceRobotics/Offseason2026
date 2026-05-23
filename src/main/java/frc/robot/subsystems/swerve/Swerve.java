@@ -8,7 +8,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,21 +19,19 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.networktables.*;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.GlobalConstants.FieldConstants;
 import frc.robot.constants.SwerveDriveConstants;
 import frc.robot.constants.SwerveDriveConstants.RealRobotConstants;
-import frc.robot.subsystems.swerve.gyroscope.Gyro;
-import frc.robot.subsystems.swerve.gyroscope.GyroIO;
+import frc.robot.subsystems.swerve.gyro.Gyro;
+import frc.robot.subsystems.swerve.gyro.GyroIO;
 import frc.robot.subsystems.swerve.module.Module;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.AutoLogOutput;
 
-@Logged
 public class Swerve extends SubsystemBase {
     private final Gyro gyro;
     private final SwerveDrivePoseEstimator swerveDrivePoseEstimator;
@@ -49,18 +46,6 @@ public class Swerve extends SubsystemBase {
             new Translation2d(0.3175, -0.24765), // Front right
             new Translation2d(-0.3175, 0.24765), // Back left
             new Translation2d(-0.3175, -0.24765)); // Back right
-
-    private final StructPublisher<Pose2d> estimatedPosePublisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Estimated Pose", Pose2d.struct)
-            .publish();
-    private final StructArrayPublisher<SwerveModuleState> currentModuleStatesPublisher =
-            NetworkTableInstance.getDefault()
-                    .getStructArrayTopic("Current Module States", SwerveModuleState.struct)
-                    .publish();
-    private final StructArrayPublisher<SwerveModuleState> desiredModuleStatesPublisher =
-            NetworkTableInstance.getDefault()
-                    .getStructArrayTopic("Desired Module States", SwerveModuleState.struct)
-                    .publish();
 
     private final SwerveDriveIO io;
 
@@ -101,8 +86,6 @@ public class Swerve extends SubsystemBase {
                 () -> {
                     return isSidePresentedAsRed();
                 });
-
-        initTelemetry();
     }
 
     public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
@@ -124,8 +107,10 @@ public class Swerve extends SubsystemBase {
         // Detect if we aren't in our alliance zone
         if ((hubPosition.getX() - robotTranslation.getX()) * (isSidePresentedAsRed() ? -1 : 1) < 0) {
             // Applies an offset to align to the closest corner of our alliance zone to pass to
-            hubPosition = hubPosition.plus(
-                    new Translation2d(0, Math.signum(robotTranslation.getY() - hubPosition.getY()) * 3));
+            hubPosition = hubPosition.plus(new Translation2d(
+                    0,
+                    Math.signum(robotTranslation.getY() - hubPosition.getY())
+                            * SwerveDriveConstants.PASS_OFFSET_FACTOR));
         }
 
         return new Rotation2d(Math.atan2(
@@ -137,25 +122,15 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         gyro.updateInputs();
-        for (Module module : getModules()) {
-            module.updateInputs();
-        }
+
+        frontLeft.updateInputs();
+        frontRight.updateInputs();
+        backLeft.updateInputs();
+        backRight.updateInputs();
 
         io.updateInputs();
+
         swerveDrivePoseEstimator.update(gyro.getRotation(), getModulePositions());
-
-        publishTelemetry();
-    }
-
-    private void publishTelemetry() {
-        estimatedPosePublisher.set(swerveDrivePoseEstimator.getEstimatedPosition());
-        currentModuleStatesPublisher.set(getModuleStates());
-        desiredModuleStatesPublisher.set(new SwerveModuleState[] {
-            frontLeft.getDesiredState(),
-            frontRight.getDesiredState(),
-            backLeft.getDesiredState(),
-            backRight.getDesiredState()
-        });
     }
 
     private void calculateStates(ChassisSpeeds chassisSpeeds) {
@@ -179,6 +154,7 @@ public class Swerve extends SubsystemBase {
         return chassisSpeeds;
     }
 
+    @AutoLogOutput(key = "Swerve/Odometry")
     public Pose2d getPose() {
         return swerveDrivePoseEstimator.getEstimatedPosition();
     }
@@ -204,9 +180,20 @@ public class Swerve extends SubsystemBase {
         };
     }
 
+    @AutoLogOutput(key = "Swerve/Current Module States")
     public SwerveModuleState[] getModuleStates() {
         return new SwerveModuleState[] {
             frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState()
+        };
+    }
+
+    @AutoLogOutput(key = "Swerve/Desired Module States")
+    public SwerveModuleState[] getDesiredModuleStates() {
+        return new SwerveModuleState[] {
+            frontLeft.getDesiredState(),
+            frontRight.getDesiredState(),
+            backLeft.getDesiredState(),
+            backRight.getDesiredState()
         };
     }
 
@@ -223,19 +210,13 @@ public class Swerve extends SubsystemBase {
                 gyro.getRotation(), getModulePositions(), new Pose2d(getPose().getTranslation(), Rotation2d.kZero));
     }
 
-    public void initTelemetry() {
-        SmartDashboard.putData("SwerveDriveTelemetry", (builder) -> {
-            builder.setSmartDashboardType("SwerveDriveTelemetry");
-        });
-    }
-
     public Module[] getModules() {
         return new Module[] {frontLeft, frontRight, backLeft, backRight};
     }
 
     public Command lockWheelsInX() {
         return Commands.run(() -> {
-            var modules = getModules();
+            Module[] modules = getModules();
             for (int i = 0; i < 4; i++) {
                 modules[i].setDesiredState(MetersPerSecond.zero(), Rotation2d.fromDegrees((i * 90) - 45));
             }

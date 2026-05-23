@@ -5,7 +5,6 @@ import static frc.robot.constants.IntakeConstants.*;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -15,7 +14,6 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
-@Logged
 public class IntakeIOSim implements IntakeIO {
     private final SparkMax intakeMotor = new SparkMax(INTAKE_MOTOR_ID, MotorType.kBrushless);
     private final SparkMax pivotMotor = new SparkMax(PIVOT_MOTOR_ID, MotorType.kBrushless);
@@ -43,8 +41,13 @@ public class IntakeIOSim implements IntakeIO {
     }
 
     @Override
-    public void updateInputs() {
+    public void updateInputs(IntakeIOInputs inputs) {
         updateSim();
+        inputs.intakeRPM = rollerSim.getAngularVelocityRPM();
+        inputs.pivotRPM = Units.radiansPerSecondToRotationsPerMinute(pivotSim.getVelocityRadPerSec());
+        inputs.pivotPosition = pivotSim.getAngleRads() <= PIVOT_ENCODER_POSITION_DEADBAND
+                ? "DOWN"
+                : (pivotSim.getAngleRads() >= (Math.PI / 2 - PIVOT_ENCODER_POSITION_DEADBAND) ? "UP" : "IN BETWEEN");
     }
 
     private void updateSim() {
@@ -63,16 +66,6 @@ public class IntakeIOSim implements IntakeIO {
     }
 
     @Override
-    public double getIntakeRPM() {
-        return rollerSim.getAngularVelocityRPM();
-    }
-
-    @Override
-    public double getPivotRPM() {
-        return Units.radiansPerSecondToRotationsPerMinute(pivotSim.getVelocityRadPerSec());
-    }
-
-    @Override
     public void setIntakeVoltage(Voltage voltage) {
         intakeMotor.setVoltage(voltage);
     }
@@ -80,17 +73,5 @@ public class IntakeIOSim implements IntakeIO {
     @Override
     public void setPivotVoltage(Voltage voltage) {
         pivotMotor.setVoltage(voltage);
-    }
-
-    @Override
-    public String getIntakeLocation() {
-        var deadband = 0.2;
-        if (pivotSim.getAngleRads() <= (0 + deadband)) {
-            return "DOWN";
-        } else if (pivotSim.getAngleRads() >= (Math.PI / 2 - deadband)) {
-            return "UP";
-        } else {
-            return "IN BETWEEN";
-        }
     }
 }

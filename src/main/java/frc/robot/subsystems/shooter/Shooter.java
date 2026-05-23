@@ -2,15 +2,15 @@ package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.constants.ShooterConstants.*;
-import static frc.robot.utilities.CustomUnits.RotationsPerMinute;
 
 import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
     private final ShooterIO io;
@@ -18,8 +18,12 @@ public class Shooter extends SubsystemBase {
     private final BangBangController bangbang = new BangBangController();
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0, 0.00242);
 
-    private double targetRPM = 0;
-    private double actualRPM = 0;
+    @AutoLogOutput
+    private double targetFlywheelRPM = 0;
+
+    private double flywheelRPM = 0;
+
+    private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
     public Shooter(ShooterIO io) {
         this.io = io;
@@ -28,31 +32,29 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        io.updateInputs();
-        actualRPM = io.getFlywheelRPM();
-        SmartDashboard.putNumber("Shooter RPM", actualRPM);
-        SmartDashboard.putNumber("Target Shooter RPM", targetRPM);
-        SmartDashboard.putNumber("Feeder RPM", io.getFeederRPM());
+        io.updateInputs(inputs);
+        Logger.processInputs("Shooter", inputs);
+        flywheelRPM = inputs.flywheelRPM;
     }
 
     public boolean shooterIsUpToSpeed() {
-        if (this.targetRPM == 0) {
+        if (this.targetFlywheelRPM == 0) {
             return false;
         }
-        return Math.abs(this.actualRPM - this.targetRPM) <= TOLERANCE_TO_RUN_FEEDER;
+        return Math.abs(this.flywheelRPM - this.targetFlywheelRPM) <= TOLERANCE_TO_RUN_FEEDER;
     }
 
     public void setFlywheelSpeed(AngularVelocity velocity) {
-        this.targetRPM = velocity.in(RotationsPerMinute);
-        bangbang.setSetpoint(targetRPM);
-        double voltage = (bangbang.calculate(actualRPM) * RoboRioDataJNI.getVInVoltage())
-                + 0.9 * feedforward.calculate(targetRPM);
+        this.targetFlywheelRPM = velocity.in(RPM);
+        bangbang.setSetpoint(targetFlywheelRPM);
+        double voltage = (bangbang.calculate(flywheelRPM) * RoboRioDataJNI.getVInVoltage())
+                + 0.9 * feedforward.calculate(targetFlywheelRPM);
 
         io.setFlywheelVoltage(Volts.of(voltage));
     }
 
     public void stopShooter() {
-        this.targetRPM = 0;
+        this.targetFlywheelRPM = 0;
         bangbang.setSetpoint(0);
         io.setFlywheelVoltage(Volts.of(0));
         this.stopFeeder();

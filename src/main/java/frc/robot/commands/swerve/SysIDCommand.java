@@ -13,13 +13,13 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.subsystems.swerve.module.ModuleIO;
+import frc.robot.subsystems.swerve.module.Module;
 import frc.robot.utilities.controller.Controller;
 
 public class SysIDCommand extends Command {
     private final Swerve swerve;
     private Routine routineType;
-    private final ModuleIO[] modules;
+    private final Module[] modules;
     private SysIdRoutine routine;
     private final Controller controller;
 
@@ -61,20 +61,19 @@ public class SysIDCommand extends Command {
     }
 
     private void setDriveVoltage(Voltage voltage) {
-        for (ModuleIO module : modules) {
+        for (Module module : modules) {
             module.setDriveVoltage(voltage);
-            module.tickPID();
         }
     }
 
     private void setAzimuthVoltage(Voltage voltage) {
-        for (ModuleIO module : modules) {
+        for (Module module : modules) {
             module.setSteerVoltage(voltage);
         }
     }
 
     private void setAzimuth(Angle angle) {
-        for (ModuleIO module : modules) {
+        for (Module module : modules) {
             module.setSteerPID(angle.in(Radians));
         }
     }

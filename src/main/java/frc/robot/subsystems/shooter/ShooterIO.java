@@ -1,18 +1,19 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
+import org.littletonrobotics.junction.AutoLog;
 
-@Logged
 public interface ShooterIO {
-    public double getFlywheelRPM();
-
-    public double getFeederRPM();
+    @AutoLog
+    public class ShooterIOInputs {
+        public double flywheelRPM = 0;
+        public double feederRPM = 0;
+    }
 
     public void setFlywheelVoltage(Voltage voltage);
 
     public void setFeederVoltage(Voltage voltage);
 
-    default void updateInputs() {}
+    public default void updateInputs(ShooterIOInputs inputs) {}
     ;
 }

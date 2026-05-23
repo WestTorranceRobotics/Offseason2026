@@ -25,8 +25,9 @@ public class HopperIOSim implements HopperIO {
     }
 
     @Override
-    public void updateInputs() {
+    public void updateInputs(HopperIOInputs inputs) {
         updateSim();
+        inputs.hopperRPM = hopperMotor.getEncoder().getVelocity();
     }
 
     private void updateSim() {
@@ -37,11 +38,6 @@ public class HopperIOSim implements HopperIO {
         hopperMotorSim.iterate(flywheelSim.getAngularVelocityRPM(), RoboRioSim.getVInVoltage(), 0.02);
 
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(flywheelSim.getCurrentDrawAmps()));
-    }
-
-    @Override
-    public double getRollerRPM() {
-        return flywheelSim.getAngularVelocityRPM();
     }
 
     @Override

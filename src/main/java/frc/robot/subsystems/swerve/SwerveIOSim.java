@@ -5,16 +5,14 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
 import frc.robot.Robot;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class SwerveIOSim implements SwerveDriveIO {
     private final SwerveDriveSimulation3D swerveDriveSimulation;
-    private StructPublisher<Pose3d> realPosePublisher;
 
     public SwerveIOSim() {
         this.swerveDriveSimulation = new SwerveDriveSimulation3D(
@@ -31,18 +29,15 @@ public class SwerveIOSim implements SwerveDriveIO {
                 new Pose2d(2, 7, Rotation2d.kZero));
 
         this.swerveDriveSimulation.registerWithArena(Robot.arena, new Pose2d(2, 7, Rotation2d.kZero));
-
-        this.realPosePublisher = NetworkTableInstance.getDefault()
-                .getStructTopic("Real Pose", Pose3d.struct)
-                .publish();
-    }
-
-    public void updateInputs() {
-        realPosePublisher.set(swerveDriveSimulation.getSimulatedDriveTrainPose3dGroundRelative());
     }
 
     public SwerveDriveSimulation3D getSimulation() {
         return swerveDriveSimulation;
+    }
+
+    @AutoLogOutput(key = "Swerve/Real Pose")
+    public Pose3d getSimulationWorldPose() {
+        return swerveDriveSimulation.getSimulatedDriveTrainPose3dGroundRelative();
     }
 
     @Override

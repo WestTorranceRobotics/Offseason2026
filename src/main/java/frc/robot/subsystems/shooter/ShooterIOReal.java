@@ -8,10 +8,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
 
-@Logged
 public class ShooterIOReal implements ShooterIO {
     private final SparkMax feederMotor = new SparkMax(FEEDER_MOTOR_ID, MotorType.kBrushless);
     private final SparkMax flywheelMotor = new SparkMax(LAUNCHER_MOTOR_1_ID, MotorType.kBrushless);
@@ -36,13 +34,9 @@ public class ShooterIOReal implements ShooterIO {
     }
 
     @Override
-    public double getFlywheelRPM() {
-        return flywheelMotor.getEncoder().getVelocity();
-    }
-
-    @Override
-    public double getFeederRPM() {
-        return feederMotor.getEncoder().getVelocity();
+    public void updateInputs(ShooterIOInputs inputs) {
+        inputs.flywheelRPM = flywheelMotor.getEncoder().getVelocity();
+        inputs.feederRPM = feederMotor.getEncoder().getVelocity();
     }
 
     @Override

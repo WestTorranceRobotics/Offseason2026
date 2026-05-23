@@ -1,6 +1,10 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.*;
+
 import frc.robot.subsystems.swerve.SwerveConfigurator;
+import frc.robot.subsystems.swerve.SwerveConfigurator.SwerveDriveModuleConstants;
+import frc.robot.subsystems.swerve.SwerveConfigurator.SwerveDriveRobotConstants;
 
 public final class SwerveDriveConstants {
     public static final double MAX_TRANSLATION_SPEED = 4;
@@ -12,6 +16,8 @@ public final class SwerveDriveConstants {
     public static final double ALIGN_D = 0.001;
 
     public static final double SKEW_COMPENSATION_FACTOR = 0.04;
+
+    public static final double PASS_OFFSET_FACTOR = 3;
 
     public static class RealRobotConstants {
         public static final int PIGEON2_ID = 9;
@@ -56,6 +62,21 @@ public final class SwerveDriveConstants {
         public static final double ROTATION_P = 13.26;
         public static final double ROTATION_I = 0;
         public static final double ROTATION_D = 0.59364;
+
+        public static final SwerveConfigurator SWERVE_CONFIGURATON = new SwerveConfigurator(
+                new SwerveDriveRobotConstants(
+                        Kilograms.of(35),
+                        Inches.of(30),
+                        Inches.of(24.5),
+                        Inches.of(2.5),
+                        Inches.of(2),
+                        RealRobotConstants.PIGEON2_ID),
+                new SwerveDriveModuleConstants[] {
+                    RealRobotConstants.RealModuleConstants.FLModuleConstants,
+                    RealRobotConstants.RealModuleConstants.FRModuleConstants,
+                    RealRobotConstants.RealModuleConstants.BLModuleConstants,
+                    RealRobotConstants.RealModuleConstants.BRModuleConstants
+                });
 
         public static class RealModuleConstants {
             public static SwerveConfigurator.SwerveDriveModuleConstants FLModuleConstants =
@@ -116,6 +137,16 @@ public final class SwerveDriveConstants {
         public static final double STEER_P = 13.26;
         public static final double STEER_I = 0;
         public static final double STEER_D = 0.59364;
+
+        public static final SwerveConfigurator SWERVE_CONFIGURATION = new SwerveConfigurator(
+                new SwerveDriveRobotConstants(
+                        Kilograms.of(35), Inches.of(30), Inches.of(24.5), Inches.of(2.5), Inches.of(2), 0),
+                new SwerveDriveModuleConstants[] {
+                    SimulatedControlSystemConstants.SimulatedModuleConstants.FLModuleConstants,
+                    SimulatedControlSystemConstants.SimulatedModuleConstants.FRModuleConstants,
+                    SimulatedControlSystemConstants.SimulatedModuleConstants.BLModuleConstants,
+                    SimulatedControlSystemConstants.SimulatedModuleConstants.BRModuleConstants
+                });
 
         public static class SimulatedModuleConstants {
             public static SwerveConfigurator.SwerveDriveModuleConstants FLModuleConstants =

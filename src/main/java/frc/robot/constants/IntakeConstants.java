@@ -12,4 +12,6 @@ public class IntakeConstants {
 
     public static final double PIVOT_UP_VOLTAGE = 4;
     public static final double PIVOT_DOWN_VOLTAGE = -5;
+
+    public static final double PIVOT_ENCODER_POSITION_DEADBAND = 0.2;
 }

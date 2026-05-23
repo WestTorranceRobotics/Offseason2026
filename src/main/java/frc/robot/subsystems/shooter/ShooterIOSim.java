@@ -35,8 +35,10 @@ public class ShooterIOSim implements ShooterIO {
     }
 
     @Override
-    public void updateInputs() {
+    public void updateInputs(ShooterIOInputs inputs) {
         updateSim();
+        inputs.flywheelRPM = flywheelSim.getAngularVelocityRPM();
+        inputs.feederRPM = feederSim.getAngularVelocityRPM();
     }
 
     private void updateSim() {
@@ -53,16 +55,6 @@ public class ShooterIOSim implements ShooterIO {
 
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(
                 flywheelSim.getCurrentDrawAmps() + feederSim.getCurrentDrawAmps()));
-    }
-
-    @Override
-    public double getFlywheelRPM() {
-        return flywheelSim.getAngularVelocityRPM();
-    }
-
-    @Override
-    public double getFeederRPM() {
-        return feederSim.getAngularVelocityRPM();
     }
 
     @Override

@@ -22,8 +22,8 @@ public class HopperIOReal implements HopperIO {
     }
 
     @Override
-    public double getRollerRPM() {
-        return hopperMotor.getEncoder().getVelocity();
+    public void updateInputs(HopperIOInputs inputs) {
+        inputs.hopperRPM = hopperMotor.getEncoder().getVelocity();
     }
 
     @Override
