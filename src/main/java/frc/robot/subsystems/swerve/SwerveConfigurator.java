@@ -93,25 +93,57 @@ public class SwerveConfigurator {
 
     public static Module[] createRealModules() {
         SwerveConfigurator defaultConfig = defaultRealConfigurator();
+        // It might be too redundant to have to define the module position twice
         return new Module[] {
-            new Module(new ModuleIOReal(SwerveModuleCornerPosition.FRONT_LEFT, defaultConfig)),
-            new Module(new ModuleIOReal(SwerveModuleCornerPosition.FRONT_RIGHT, defaultConfig)),
-            new Module(new ModuleIOReal(SwerveModuleCornerPosition.BACK_LEFT, defaultConfig)),
-            new Module(new ModuleIOReal(SwerveModuleCornerPosition.BACK_RIGHT, defaultConfig))
+            new Module(
+                    new ModuleIOReal(SwerveModuleCornerPosition.FRONT_LEFT, defaultConfig),
+                    defaultConfig.swerveDriveRobotConstants,
+                    defaultConfig.getModuleConstants(SwerveModuleCornerPosition.FRONT_LEFT)),
+            new Module(
+                    new ModuleIOReal(SwerveModuleCornerPosition.FRONT_RIGHT, defaultConfig),
+                    defaultConfig.swerveDriveRobotConstants,
+                    defaultConfig.getModuleConstants(SwerveModuleCornerPosition.FRONT_RIGHT)),
+            new Module(
+                    new ModuleIOReal(SwerveModuleCornerPosition.BACK_LEFT, defaultConfig),
+                    defaultConfig.swerveDriveRobotConstants,
+                    defaultConfig.getModuleConstants(SwerveModuleCornerPosition.BACK_LEFT)),
+            new Module(
+                    new ModuleIOReal(SwerveModuleCornerPosition.BACK_RIGHT, defaultConfig),
+                    defaultConfig.swerveDriveRobotConstants,
+                    defaultConfig.getModuleConstants(SwerveModuleCornerPosition.BACK_RIGHT))
         };
     }
 
     public static Module[] createSimModules(SwerveDriveSimulation3D swerveDriveSimulation) {
         SwerveConfigurator defaultConfig = defaultSimConfigurator();
+        // It might be too redundant to have to define the module position twice
         return new Module[] {
-            new Module(new ModuleIOSim(
-                    swerveDriveSimulation.getModules()[0], SwerveModuleCornerPosition.FRONT_LEFT, defaultConfig)),
-            new Module(new ModuleIOSim(
-                    swerveDriveSimulation.getModules()[1], SwerveModuleCornerPosition.FRONT_RIGHT, defaultConfig)),
-            new Module(new ModuleIOSim(
-                    swerveDriveSimulation.getModules()[2], SwerveModuleCornerPosition.BACK_LEFT, defaultConfig)),
-            new Module(new ModuleIOSim(
-                    swerveDriveSimulation.getModules()[3], SwerveModuleCornerPosition.BACK_RIGHT, defaultConfig))
+            new Module(
+                    new ModuleIOSim(
+                            swerveDriveSimulation.getModules()[0],
+                            SwerveModuleCornerPosition.FRONT_LEFT,
+                            defaultConfig),
+                    defaultConfig.swerveDriveRobotConstants,
+                    defaultConfig.getModuleConstants(SwerveModuleCornerPosition.FRONT_LEFT)),
+            new Module(
+                    new ModuleIOSim(
+                            swerveDriveSimulation.getModules()[1],
+                            SwerveModuleCornerPosition.FRONT_RIGHT,
+                            defaultConfig),
+                    defaultConfig.swerveDriveRobotConstants,
+                    defaultConfig.getModuleConstants(SwerveModuleCornerPosition.FRONT_RIGHT)),
+            new Module(
+                    new ModuleIOSim(
+                            swerveDriveSimulation.getModules()[2], SwerveModuleCornerPosition.BACK_LEFT, defaultConfig),
+                    defaultConfig.swerveDriveRobotConstants,
+                    defaultConfig.getModuleConstants(SwerveModuleCornerPosition.BACK_LEFT)),
+            new Module(
+                    new ModuleIOSim(
+                            swerveDriveSimulation.getModules()[3],
+                            SwerveModuleCornerPosition.BACK_RIGHT,
+                            defaultConfig),
+                    defaultConfig.swerveDriveRobotConstants,
+                    defaultConfig.getModuleConstants(SwerveModuleCornerPosition.BACK_RIGHT))
         };
     }
 

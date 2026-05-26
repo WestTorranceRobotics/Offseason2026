@@ -2,18 +2,11 @@ package frc.robot.subsystems.swerve.module;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.*;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import frc.robot.RobotContainer;
-import frc.robot.constants.GlobalConstants;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.subsystems.swerve.SwerveConfigurator;
-import frc.robot.utilities.MathUtils;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
@@ -21,53 +14,25 @@ public class ModuleIOSim implements ModuleIO {
     private final SwerveModuleSimulation swerveModuleSimulation;
     private final SimulatedMotorController.GenericMotorController driveMotor;
     private final SimulatedMotorController.GenericMotorController steerMotor;
-    private final SwerveModulePosition swerveModulePosition;
-
-    private final SimpleMotorFeedforward driveFeedforward;
-    private final PIDController drivePID;
-    private final PIDController steerPID;
-
-    private final SwerveModuleState desiredState;
-
-    private final String moduleName;
-    private final Translation2d unitRotationVec;
-
-    private final Distance simulatedCircumference;
-
-    private final SwerveConfigurator.SwerveDriveModuleConstants moduleConstants;
 
     public ModuleIOSim(
             SwerveModuleSimulation swerveModuleSimulation,
             SwerveConfigurator.SwerveModuleCornerPosition cornerPosition,
             SwerveConfigurator swerveDriveConfigurator) {
         this.swerveModuleSimulation = swerveModuleSimulation;
-
-        this.moduleConstants = swerveDriveConfigurator.getModuleConstants(cornerPosition);
-
-        this.swerveModulePosition = new SwerveModulePosition();
-
         this.driveMotor =
                 swerveModuleSimulation.useGenericMotorControllerForDrive().withCurrentLimit(Amps.of(80));
         this.steerMotor = swerveModuleSimulation.useGenericControllerForSteer().withCurrentLimit(Amps.of(20));
+    }
 
-        this.driveFeedforward = new SimpleMotorFeedforward(moduleConstants.DRIVE_S, moduleConstants.DRIVE_V, 0);
-        this.drivePID = new PIDController(moduleConstants.DRIVE_P, moduleConstants.DRIVE_I, moduleConstants.DRIVE_D);
-        this.steerPID =
-                new PIDController(moduleConstants.AZIMUTH_P, moduleConstants.AZIMUTH_I, moduleConstants.AZIMUTH_D);
-        steerPID.enableContinuousInput(-Math.PI, Math.PI);
-
-        this.moduleName = moduleConstants.getModuleName();
-
-        // This unit is 1 rad / sec
-        // Proof: assume the wheel moves along a circle about the robot center. Length of an arc is
-        // radius times angle in radians, so the length of the arc is the distance of the module to
-        // the center times one radian
-        this.unitRotationVec = moduleConstants.physicalModulePosition.rotateBy(Rotation2d.kCCW_90deg);
-        this.desiredState = new SwerveModuleState(0, new Rotation2d());
-
-        this.simulatedCircumference = swerveDriveConfigurator.swerveDriveRobotConstants.wheelCircumference;
-
-        telemetry();
+    @Override
+    public void updateInputs(ModuleIOInputs inputs) {
+        inputs.driveVoltage = getDriveVoltage().magnitude();
+        inputs.steerVoltage = getSteerVoltage().magnitude();
+        inputs.driveWheelPositionRotations = getDriveWheelPosition().in(Rotations);
+        inputs.driveWheelVelocityRPS = getDriveWheelVelocity().in(RotationsPerSecond);
+        inputs.steerAngleRad = getSteerAngle().getRadians();
+        inputs.steerVelocityRadPerSec = getSteerVelocity().in(RadiansPerSecond);
     }
 
     @Override
@@ -80,7 +45,6 @@ public class ModuleIOSim implements ModuleIO {
         this.steerMotor.requestVoltage(voltage);
     }
 
-    // TODO clamp any voltages sent to motors
     @Override
     public Voltage getDriveVoltage() {
         return this.driveMotor.getAppliedVoltage();
@@ -104,84 +68,6 @@ public class ModuleIOSim implements ModuleIO {
     @Override
     public AngularVelocity getDriveWheelVelocity() {
         return swerveModuleSimulation.getDriveWheelFinalSpeed();
-    }
-
-    @Override
-    public SwerveModuleState getState() {
-        return swerveModuleSimulation.getCurrentState();
-    }
-
-    @Override
-    public SwerveModulePosition getPosition() {
-        swerveModulePosition.angle = this.getSteerAngle();
-        swerveModulePosition.distanceMeters =
-                this.getDriveWheelPosition().in(Rotations) * simulatedCircumference.in(Meters);
-        return this.swerveModulePosition;
-    }
-
-    @Override
-    public void setSteerPID(double angle) {
-        steerPID.setSetpoint(angle);
-    }
-
-    @Override
-    public void setDrivePID(double speed) {
-        drivePID.setSetpoint(speed);
-    }
-
-    @Override
-    public void setDesiredState(LinearVelocity speed, Rotation2d angle) {
-        if (angle != null) this.desiredState.angle = angle;
-        this.desiredState.speedMetersPerSecond = speed.in(MetersPerSecond);
-        setDrivePID(desiredState.speedMetersPerSecond);
-
-        setSteerPID(desiredState.angle.getRadians());
-    }
-
-    @Override
-    public SwerveModuleState getDesiredState() {
-        return desiredState;
-    }
-
-    @Override
-    public void tickPID() {
-        setSteerVoltage(Volts.of(steerPID.calculate(getSteerAngle().getRadians())));
-        if (desiredState != null) {
-
-            setDriveVoltage(Volts.of(drivePID.calculate(
-                            getDriveWheelVelocity().in(RotationsPerSecond) * simulatedCircumference.in(Meters))
-                    + driveFeedforward.calculate(desiredState.speedMetersPerSecond)));
-        }
-    }
-
-    @Override
-    public String getModuleName() {
-        return moduleName;
-    }
-
-    @Override
-    public Translation2d getUnitRotationVec() {
-        return unitRotationVec;
-    }
-
-    @Override
-    public void telemetryHook(SendableBuilder sendableBuilder) {
-        sendableBuilder.addDoubleProperty(getModuleName() + "-dError", drivePID::getError, null);
-        sendableBuilder.addDoubleProperty(
-                getModuleName() + "-dDesired_speed", () -> desiredState.speedMetersPerSecond, null);
-        sendableBuilder.addDoubleProperty(
-                getModuleName() + "-dReal_speed",
-                () -> getDriveWheelVelocity().in(RotationsPerSecond) * simulatedCircumference.in(Meters),
-                null);
-        sendableBuilder.addDoubleProperty(
-                getModuleName() + "dacc",
-                () -> RobotContainer.swerveDriveSimulation.getPhysicsBody() == null
-                        ? 0
-                        : MathUtils.getMagnitude(RobotContainer.swerveDriveSimulation
-                                        .getPhysicsBody()
-                                        .getAngularVelocityRadPerSec())
-                                / GlobalConstants.PhysicalRobotConstants.ROBOT_MASS.in(Kilogram),
-                null);
     }
 
     @Override
