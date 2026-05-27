@@ -7,14 +7,13 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.module.Module;
 import frc.robot.utilities.controller.Controller;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class SysIDCommand extends Command {
     private final Swerve swerve;
@@ -23,7 +22,7 @@ public class SysIDCommand extends Command {
     private SysIdRoutine routine;
     private final Controller controller;
 
-    private final SendableChooser<Routine> sendableChooser;
+    private final LoggedDashboardChooser<Routine> sendableChooser;
 
     private final DefaultJoystickCommand defaultJoystickCommand;
 
@@ -36,12 +35,12 @@ public class SysIDCommand extends Command {
 
         this.createRoutine(routineType);
 
-        this.sendableChooser = new SendableChooser<>();
+        this.sendableChooser = new LoggedDashboardChooser<>("SysID");
 
         this.defaultJoystickCommand = new DefaultJoystickCommand(
                 controller::getLeftX, controller::getLeftY, controller::getRightX, swerveDrive);
 
-        sendableChooser.setDefaultOption("Teleop", Routine.TELEOP);
+        sendableChooser.addDefaultOption("Teleop", Routine.TELEOP);
 
         sendableChooser.addOption("Dynamic Drive", Routine.DRIVE_VELOCITY_DYNAMIC);
         sendableChooser.addOption("QS Drive", Routine.DRIVE_VELOCITY_QUASISTATIC);
@@ -54,8 +53,6 @@ public class SysIDCommand extends Command {
         sendableChooser.addOption("QS Steer Reverse", Routine.STEER_QUASISTATIC_REVERSE);
 
         sendableChooser.onChange(this::createRoutine);
-
-        SmartDashboard.putData("SysID", sendableChooser);
 
         addRequirements(swerve);
     }

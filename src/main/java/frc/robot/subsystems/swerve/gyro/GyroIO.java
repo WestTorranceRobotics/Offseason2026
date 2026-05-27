@@ -15,5 +15,5 @@ public interface GyroIO {
         public AngularVelocity angularVelocity = RadiansPerSecond.of(0);
     }
 
-    public default void updateInputs(GyroIOInputs inputd) {}
+    public default void updateInputs(GyroIOInputs inputs) {}
 }

@@ -17,8 +17,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.subsystems.swerve.SwerveConfigurator;
@@ -31,9 +29,8 @@ public class ModuleIOReal implements ModuleIO {
     private final CANcoder CANCoder;
 
     // TODO Document this
-    public ModuleIOReal(
-            SwerveConfigurator.SwerveModuleCornerPosition cornerPosition, SwerveConfigurator swerveDriveConfigurator) {
-        this.moduleConstants = swerveDriveConfigurator.getModuleConstants(cornerPosition);
+    public ModuleIOReal(SwerveConfigurator.SwerveDriveModuleConstants moduleConstants) {
+        this.moduleConstants = moduleConstants;
 
         // Drive motor config
         driveMotorController = new TalonFX(moduleConstants.driveMotorID);
@@ -75,12 +72,22 @@ public class ModuleIOReal implements ModuleIO {
 
     @Override
     public void updateInputs(ModuleIOInputs inputs) {
-        inputs.driveVoltage = getDriveVoltage().magnitude();
-        inputs.steerVoltage = getSteerVoltage().magnitude();
-        inputs.driveWheelPositionRotations = getDriveWheelPosition().in(Rotations);
-        inputs.driveWheelVelocityRPS = getDriveWheelVelocity().in(RotationsPerSecond);
-        inputs.steerAngleRad = getSteerAngle().getRadians();
-        inputs.steerVelocityRadPerSec = getSteerVelocity().in(RadiansPerSecond);
+        inputs.driveVoltage = driveMotorController.getMotorVoltage().getValue().magnitude();
+        inputs.steerVoltage = steerMotorController.getAppliedOutput() * RobotController.getBatteryVoltage();
+
+        inputs.driveWheelPositionRotations = driveMotorController
+                .getPosition()
+                .getValue()
+                .times(moduleConstants.driveGearRatio)
+                .in(Rotations);
+        inputs.driveWheelVelocityRPS = driveMotorController
+                .getVelocity()
+                .getValue()
+                .times(moduleConstants.driveGearRatio)
+                .in(RotationsPerSecond);
+
+        inputs.steerAngleRad = new Rotation2d(CANCoder.getAbsolutePosition().getValue()).getRadians();
+        inputs.steerVelocityRadPerSec = CANCoder.getVelocity().getValue().in(RadiansPerSecond);
     }
 
     @Override
@@ -91,33 +98,5 @@ public class ModuleIOReal implements ModuleIO {
     @Override
     public void setSteerVoltage(Voltage voltage) {
         steerMotorController.setVoltage(voltage);
-    }
-
-    @Override
-    public AngularVelocity getSteerVelocity() {
-        return CANCoder.getVelocity().getValue();
-    }
-
-    @Override
-    public Rotation2d getSteerAngle() {
-        return new Rotation2d(CANCoder.getAbsolutePosition().getValue());
-    }
-
-    @Override
-    public Angle getDriveWheelPosition() {
-        return driveMotorController.getPosition().getValue().times(moduleConstants.driveGearRatio);
-    }
-
-    @Override
-    public AngularVelocity getDriveWheelVelocity() {
-        return driveMotorController.getVelocity().getValue().times(moduleConstants.driveGearRatio);
-    }
-
-    public Voltage getDriveVoltage() {
-        return driveMotorController.getMotorVoltage().getValue();
-    }
-
-    public Voltage getSteerVoltage() {
-        return Volts.of(steerMotorController.getAppliedOutput() * RobotController.getBatteryVoltage());
     }
 }

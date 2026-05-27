@@ -7,8 +7,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.intake.IntakeCommand;
@@ -43,6 +41,8 @@ import frc.robot.utilities.controller.Controller;
 import frc.robot.utilities.controller.DualShock4Controller;
 import frc.robot.utilities.controller.LogitechController;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -66,19 +66,13 @@ public class RobotContainer {
 
     public static Vision vision;
 
-    private final SendableChooser<Double> shooterSpeedChooser = new SendableChooser<>();
-    private SendableChooser<Command> autoChooser = new SendableChooser<>();
+    private final LoggedNetworkNumber shooterRPMTuning = new LoggedNetworkNumber("/Tuning/Shooter RPM", 3000.0);
+    private LoggedDashboardChooser<Command> autoChooser;
 
     /**
      * Registers all important robot code, e.g. swerve, path planner, controls
      */
     public RobotContainer() {
-        for (double startingRPM = 2500; startingRPM < 4600; startingRPM += 50) {
-            shooterSpeedChooser.addOption(String.format("%s RPM", startingRPM), startingRPM);
-        }
-        shooterSpeedChooser.setDefaultOption("Default (3000 RPM)", 3000.0);
-        SmartDashboard.putData("Run Shooter at X RPM:", shooterSpeedChooser);
-
         if (Robot.isReal()) {
             swerveDrive = new Swerve(new SwerveIOReal(), new GyroIOReal(), SwerveConfigurator.createRealModules());
 
@@ -105,9 +99,11 @@ public class RobotContainer {
         overrideController = new LogitechController(OperatorConstants.OVERRIDE_CONTROLLER_PORT);
 
         registerNamedCommands();
-        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
-                (stream) -> stream.filter(auto -> !auto.getName().startsWith("test")));
-        SmartDashboard.putData("Current Auto:", autoChooser);
+
+        autoChooser = new LoggedDashboardChooser<>(
+                "Auto Routine",
+                AutoBuilder.buildAutoChooserWithOptionsModifier(
+                        (stream) -> stream.filter(auto -> !auto.getName().startsWith("test"))));
 
         configureBindings();
     }
@@ -163,7 +159,7 @@ public class RobotContainer {
      * Gets path planner auto to be run during autonomous.
      */
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        return autoChooser.get();
     }
 
     /**

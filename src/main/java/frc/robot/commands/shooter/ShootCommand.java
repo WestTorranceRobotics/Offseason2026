@@ -6,12 +6,12 @@ import static frc.robot.constants.ShooterConstants.*;
 import static org.ironmaple.utils.FieldMirroringUtils.toCurrentAllianceTranslation;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.GlobalConstants.FieldConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.vision.Vision;
+import org.littletonrobotics.junction.Logger;
 
 public class ShootCommand extends Command {
     private final Shooter shooter;
@@ -61,7 +61,7 @@ public class ShootCommand extends Command {
             shooter.setFeederVoltage(Volts.of(FEEDER_VOLTAGE));
         }
 
-        SmartDashboard.putNumber("Distance from hub", lastDistanceToHub);
+        Logger.recordOutput("Distance From Hub", lastDistanceToHub);
     }
 
     @Override

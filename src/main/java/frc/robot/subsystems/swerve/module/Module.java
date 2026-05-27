@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
@@ -28,8 +27,6 @@ public class Module {
 
     private final String moduleName;
 
-    private final Translation2d unitRotationVec;
-
     private final SwerveModuleState desiredState = new SwerveModuleState(0, new Rotation2d());
     private final SwerveModuleState currentState = new SwerveModuleState(0, new Rotation2d());
 
@@ -43,13 +40,8 @@ public class Module {
             SwerveConfigurator.SwerveDriveModuleConstants moduleConstants) {
         this.io = io;
         this.robotConstants = robotConstants;
-        this.moduleName = moduleConstants.getModuleName();
 
-        // This unit is 1 rad / sec
-        // Proof: assume the wheel moves along a circle about the robot center. Length of an arc is
-        // radius times angle in radians, so the length of the arc is the distance of the module to
-        // the center times one radian
-        this.unitRotationVec = moduleConstants.physicalModulePosition.rotateBy(Rotation2d.kCCW_90deg);
+        this.moduleName = moduleConstants.getModuleName();
 
         this.steerVoltageCoefficient = moduleConstants.azimuthReversed ? -1 : 1;
         this.steerPIDController =
@@ -110,24 +102,24 @@ public class Module {
     }
 
     public AngularVelocity getDriveWheelVelocity() {
-        return io.getDriveWheelVelocity();
+        return RotationsPerSecond.of(inputs.driveWheelVelocityRPS);
     }
 
     public Angle getDriveWheelPosition() {
-        return io.getDriveWheelPosition();
+        return Rotations.of(inputs.driveWheelPositionRotations);
     }
 
     // TODO clamp any voltages sent to motors
     public Voltage getDriveVoltage() {
-        return io.getDriveVoltage();
+        return Volts.of(inputs.driveVoltage);
     }
 
     public Voltage getSteerVoltage() {
-        return io.getSteerVoltage();
+        return Volts.of(inputs.steerVoltage);
     }
 
     public AngularVelocity getSteerVelocity() {
-        return io.getSteerVelocity();
+        return RadiansPerSecond.of(inputs.steerVelocityRadPerSec);
     }
 
     public void tickPID() {
@@ -136,13 +128,5 @@ public class Module {
         io.setDriveVoltage(Volts.of(drivePIDController.calculate(
                         inputs.driveWheelVelocityRPS * robotConstants.wheelCircumference.in(Meters))
                 + driveFeedforward.calculate(desiredState.speedMetersPerSecond)));
-    }
-
-    public String getModuleName() {
-        return moduleName;
-    }
-
-    public Translation2d getUnitRotationVec() {
-        return unitRotationVec;
     }
 }
