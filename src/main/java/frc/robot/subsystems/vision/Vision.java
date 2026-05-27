@@ -35,6 +35,8 @@ public class Vision extends SubsystemBase {
 
     @Override
     public void periodic() {
+        io.updateInputs(inputs);
+
         if (!inputs.results.isEmpty()) {
             PhotonPipelineResult result = inputs.results.get(inputs.results.size() - 1);
             if (result.hasTargets()) {
@@ -46,8 +48,6 @@ public class Vision extends SubsystemBase {
             }
         }
         fuseVisionPoseEstimates();
-
-        io.updateInputs(inputs);
     }
 
     private PhotonTrackedTarget getTrackedTarget(int targetID) {
