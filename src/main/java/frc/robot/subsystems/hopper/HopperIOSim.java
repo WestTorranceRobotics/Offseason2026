@@ -5,20 +5,20 @@ import static frc.robot.constants.HopperConstants.*;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.system.Models;
+import org.wpilib.simulation.BatterySim;
+import org.wpilib.simulation.FlywheelSim;
+import org.wpilib.simulation.RoboRioSim;
+import org.wpilib.units.measure.Voltage;
 
 public class HopperIOSim implements HopperIO {
-    private final SparkMax hopperMotor = new SparkMax(HOPPER_MOTOR_ID, MotorType.kBrushless);
+    private final SparkMax hopperMotor = new SparkMax(HOPPER_MOTOR_ID, 0, MotorType.kBrushless);
     private final SparkMaxSim hopperMotorSim;
 
     // TODO: Find MOI (moment of inertia)
     private final FlywheelSim flywheelSim = new FlywheelSim(
-            LinearSystemId.createFlywheelSystem(DCMotor.getNEO(1), 0.00062156662, 1), DCMotor.getNEO(1));
+            Models.flywheelFromPhysicalConstants(DCMotor.getNEO(1), 0.00062156662, 1), DCMotor.getNEO(1));
 
     public HopperIOSim() {
         hopperMotorSim = new SparkMaxSim(hopperMotor, DCMotor.getNEO(1));
@@ -27,7 +27,7 @@ public class HopperIOSim implements HopperIO {
     @Override
     public void updateInputs(HopperIOInputs inputs) {
         updateSim();
-        inputs.hopperRPM = hopperMotor.getEncoder().getVelocity();
+        inputs.hopperRPM = hopperMotor.getEncoder().getVelocity().get();
     }
 
     private void updateSim() {
@@ -35,9 +35,9 @@ public class HopperIOSim implements HopperIO {
         flywheelSim.update(0.02);
 
         // Update motor
-        hopperMotorSim.iterate(flywheelSim.getAngularVelocityRPM(), RoboRioSim.getVInVoltage(), 0.02);
+        hopperMotorSim.iterate(flywheelSim.getAngularVelocity(), RoboRioSim.getVInVoltage(), 0.02);
 
-        RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(flywheelSim.getCurrentDrawAmps()));
+        RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(flywheelSim.getCurrentDraw()));
     }
 
     @Override

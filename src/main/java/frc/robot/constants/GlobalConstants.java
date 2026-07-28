@@ -4,12 +4,12 @@
 
 package frc.robot.constants;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.wpilibj.RobotBase;
+import org.wpilib.framework.RobotBase;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.Mass;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide

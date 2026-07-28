@@ -1,10 +1,10 @@
 package frc.robot.commands.hopper;
 
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.HopperConstants;
 import frc.robot.subsystems.hopper.Hopper;
+import org.wpilib.command2.Command;
 
 public class HopperCommand extends Command {
     private final Hopper hopper;

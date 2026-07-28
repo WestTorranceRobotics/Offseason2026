@@ -1,19 +1,19 @@
 package frc.robot.commands.swerve;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Radians;
+import static org.wpilib.units.Units.Second;
+import static org.wpilib.units.Units.Seconds;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.module.Module;
 import frc.robot.utilities.controller.Controller;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.sysid.SysIdRoutine;
+import org.wpilib.sysid.SysIdRoutineLog;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.Voltage;
 
 public class SysIDCommand extends Command {
     private final Swerve swerve;

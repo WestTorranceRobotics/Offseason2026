@@ -1,10 +1,10 @@
 package frc.robot.subsystems.swerve.module;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.units.measure.Voltage;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
+import org.wpilib.units.measure.Voltage;
 
 public class ModuleIOSim implements ModuleIO {
     private final SwerveModuleSimulation swerveModuleSimulation;
@@ -14,8 +14,10 @@ public class ModuleIOSim implements ModuleIO {
     public ModuleIOSim(SwerveModuleSimulation swerveModuleSimulation) {
         this.swerveModuleSimulation = swerveModuleSimulation;
         this.driveMotor =
-                swerveModuleSimulation.useGenericMotorControllerForDrive().withCurrentLimit(Amps.of(80));
-        this.steerMotor = swerveModuleSimulation.useGenericControllerForSteer().withCurrentLimit(Amps.of(20));
+                swerveModuleSimulation.useGenericMotorControllerForDrive()
+                        .withCurrentLimit(Amps.of(80));
+        this.steerMotor = swerveModuleSimulation.useGenericControllerForSteer()
+                        .withCurrentLimit(Amps.of(20));
     }
 
     @Override

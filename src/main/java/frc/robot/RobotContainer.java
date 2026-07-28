@@ -6,9 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.OutakeCommand;
 import frc.robot.commands.intake.PivotDownCommand;
@@ -40,9 +37,13 @@ import frc.robot.subsystems.vision.VisionIOSim;
 import frc.robot.utilities.controller.Controller;
 import frc.robot.utilities.controller.DualShock4Controller;
 import frc.robot.utilities.controller.LogitechController;
+
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.math.kinematics.ChassisVelocities;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -166,6 +167,6 @@ public class RobotContainer {
      * Stops the robot's movement.
      */
     public void clearModuleStates() {
-        swerveDrive.drive(new ChassisSpeeds(), true);
+        swerveDrive.drive(new ChassisVelocities(), true);
     }
 }

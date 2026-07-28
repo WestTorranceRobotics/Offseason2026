@@ -1,10 +1,10 @@
 package frc.robot.commands.intake;
 
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.subsystems.intake.Intake;
+import org.wpilib.command2.Command;
 
 public class PivotDownCommand extends Command {
     private final Intake intake;

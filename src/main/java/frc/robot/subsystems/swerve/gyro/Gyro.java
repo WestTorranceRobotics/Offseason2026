@@ -1,11 +1,10 @@
 package frc.robot.subsystems.swerve.gyro;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.Logger;
+import org.wpilib.math.geometry.Rotation2d;
 
 public class Gyro {
     private final GyroIO io;
-
     private final GyroIOInputsAutoLogged inputs = new GyroIOInputsAutoLogged();
 
     public Gyro(GyroIO io) {

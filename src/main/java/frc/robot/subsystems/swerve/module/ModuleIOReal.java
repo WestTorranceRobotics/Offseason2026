@@ -1,7 +1,8 @@
 package frc.robot.subsystems.swerve.module;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -16,10 +17,10 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.subsystems.swerve.SwerveConfigurator;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.system.RobotController;
+import org.wpilib.units.measure.Voltage;
 
 public class ModuleIOReal implements ModuleIO {
     private final SwerveConfigurator.SwerveDriveModuleConstants moduleConstants;
@@ -33,7 +34,7 @@ public class ModuleIOReal implements ModuleIO {
         this.moduleConstants = moduleConstants;
 
         // Drive motor config
-        driveMotorController = new TalonFX(moduleConstants.driveMotorID);
+        driveMotorController = new TalonFX(moduleConstants.driveMotorID, CANBus.systemcore(0));
 
         TalonFXConfigurator driveMotorConfigurator = driveMotorController.getConfigurator();
         Slot0Configs slot0Configs = new Slot0Configs();
@@ -52,9 +53,9 @@ public class ModuleIOReal implements ModuleIO {
         driveMotorConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
 
         // Azimuth motor config
-        steerMotorController = new SparkMax(moduleConstants.azimuthMotorID, SparkMax.MotorType.kBrushless);
+         // TODO: set IDs!!
+        steerMotorController = new SparkMax(moduleConstants.azimuthMotorID, 0, SparkMax.MotorType.kBrushless);
         SparkMaxConfig sparkMaxConfig = new SparkMaxConfig();
-        // TODO figure out this open loop ramp rate
         sparkMaxConfig
                 .smartCurrentLimit(40)
                 .idleMode(SparkBaseConfig.IdleMode.kCoast)
@@ -62,7 +63,7 @@ public class ModuleIOReal implements ModuleIO {
         steerMotorController.configure(sparkMaxConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         // CANCoder config
-        CANCoder = new CANcoder(moduleConstants.CANCoderID);
+        CANCoder = new CANcoder(moduleConstants.CANCoderID, CANBus.systemcore(0));
         CANcoderConfiguration configuration = new CANcoderConfiguration();
         configuration.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         configuration.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
@@ -73,7 +74,7 @@ public class ModuleIOReal implements ModuleIO {
     @Override
     public void updateInputs(ModuleIOInputs inputs) {
         inputs.driveVoltage = driveMotorController.getMotorVoltage().getValue().magnitude();
-        inputs.steerVoltage = steerMotorController.getAppliedOutput() * RobotController.getBatteryVoltage();
+        inputs.steerVoltage = steerMotorController.getAppliedOutput().get() * RobotController.getBatteryVoltage();
 
         inputs.driveWheelPositionRotations = driveMotorController
                 .getPosition()

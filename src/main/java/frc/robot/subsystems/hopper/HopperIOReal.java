@@ -8,10 +8,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.units.measure.Voltage;
+import org.wpilib.units.measure.Voltage;
 
 public class HopperIOReal implements HopperIO {
-    private final SparkMax hopperMotor = new SparkMax(HOPPER_MOTOR_ID, MotorType.kBrushless);
+    private final SparkMax hopperMotor = new SparkMax(HOPPER_MOTOR_ID, 0, MotorType.kBrushless);
 
     public HopperIOReal() {
         SparkMaxConfig hopperConfig = new SparkMaxConfig();
@@ -23,7 +23,7 @@ public class HopperIOReal implements HopperIO {
 
     @Override
     public void updateInputs(HopperIOInputs inputs) {
-        inputs.hopperRPM = hopperMotor.getEncoder().getVelocity();
+        inputs.hopperRPM = hopperMotor.getEncoder().getVelocity().get();
     }
 
     @Override

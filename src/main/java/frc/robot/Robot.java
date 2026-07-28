@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.GlobalConstants;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt3D;
@@ -15,6 +13,8 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;
 
 public class Robot extends LoggedRobot {
     private final RobotContainer m_robotContainer;
@@ -64,19 +64,16 @@ public class Robot extends LoggedRobot {
      * and SmartDashboard
      * integrated updating.
      */
-    @Override
     public void robotPeriodic() {
         // Do not remove, ticks commands
         CommandScheduler.getInstance().run();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
-    @Override
     public void disabledInit() {
         m_robotContainer.clearModuleStates();
     }
 
-    @Override
     public void disabledPeriodic() {}
 
     /**
@@ -84,7 +81,6 @@ public class Robot extends LoggedRobot {
      * <p>
      * Schedules autonomous command
      */
-    @Override
     public void autonomousInit() {
         autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -94,11 +90,9 @@ public class Robot extends LoggedRobot {
     }
 
     /** This function is called periodically during autonomous. */
-    @Override
     public void autonomousPeriodic() {}
 
     /** Called at beginning of teleop */
-    @Override
     public void teleopInit() {
         // Makes sure the autonomous command stops running when teleop starts.
         if (autonomousCommand != null) {
@@ -107,25 +101,20 @@ public class Robot extends LoggedRobot {
     }
 
     /** This function is called periodically during operator control. */
-    @Override
     public void teleopPeriodic() {}
 
-    @Override
     public void testInit() {
         // Cancels all running commands at the start of test mode.
         CommandScheduler.getInstance().cancelAll();
     }
 
     /** This function is called periodically during test mode. */
-    @Override
     public void testPeriodic() {}
 
     /** This function is called once when the robot is first started up. */
-    @Override
     public void simulationInit() {}
 
     /** This function is called periodically whilst in simulation. */
-    @Override
     public void simulationPeriodic() {
         arena.simulationPeriodic();
     }

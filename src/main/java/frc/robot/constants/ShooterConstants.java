@@ -1,6 +1,6 @@
 package frc.robot.constants;
 
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import org.wpilib.math.interpolation.InterpolatingDoubleTreeMap;
 
 public final class ShooterConstants {
     public static final int FEEDER_MOTOR_ID = 49;

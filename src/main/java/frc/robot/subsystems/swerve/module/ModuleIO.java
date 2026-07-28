@@ -1,7 +1,7 @@
 package frc.robot.subsystems.swerve.module;
 
-import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
+import org.wpilib.units.measure.Voltage;
 
 public interface ModuleIO {
     @AutoLog

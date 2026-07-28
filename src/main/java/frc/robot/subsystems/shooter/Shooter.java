@@ -1,16 +1,16 @@
 package frc.robot.subsystems.shooter;
 
-import static edu.wpi.first.units.Units.*;
 import static frc.robot.constants.ShooterConstants.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.hal.simulation.RoboRioDataJNI;
-import edu.wpi.first.math.controller.BangBangController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.hardware.hal.simulation.RoboRioDataJNI;
+import org.wpilib.math.controller.BangBangController;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Voltage;
 
 public class Shooter extends SubsystemBase {
     private final ShooterIO io;

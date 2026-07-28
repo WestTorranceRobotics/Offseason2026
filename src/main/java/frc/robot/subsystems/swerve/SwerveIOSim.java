@@ -1,10 +1,10 @@
 package frc.robot.subsystems.swerve;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
 import frc.robot.Robot;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
@@ -19,8 +19,8 @@ public class SwerveIOSim implements SwerveDriveIO {
                 DriveTrainSimulationConfig.Default()
                         .withRobotMass(Pounds.of(75))
                         .withSwerveModule(COTS.ofSwerveX2(
-                                edu.wpi.first.math.system.plant.DCMotor.getKrakenX60(1),
-                                edu.wpi.first.math.system.plant.DCMotor.getNEO(1),
+                                org.wpilib.math.system.DCMotor.getKrakenX60(1),
+                                org.wpilib.math.system.DCMotor.getNEO(1),
                                 COTS.WHEELS.SLS_PRINTED_WHEELS.cof,
                                 2,
                                 11))

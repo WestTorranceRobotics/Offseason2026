@@ -5,17 +5,17 @@ import static frc.robot.constants.ShooterConstants.*;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.system.Models;
+import org.wpilib.simulation.BatterySim;
+import org.wpilib.simulation.FlywheelSim;
+import org.wpilib.simulation.RoboRioSim;
+import org.wpilib.units.measure.Voltage;
 
 public class ShooterIOSim implements ShooterIO {
-    private final SparkMax feederMotor = new SparkMax(FEEDER_MOTOR_ID, MotorType.kBrushless);
-    private final SparkMax flywheelMotor = new SparkMax(LAUNCHER_MOTOR_1_ID, MotorType.kBrushless);
-    private final SparkMax flywheelMotorInverted = new SparkMax(LAUNCHER_MOTOR_2_ID, MotorType.kBrushless);
+    private final SparkMax feederMotor = new SparkMax(FEEDER_MOTOR_ID, 0, MotorType.kBrushless);
+    private final SparkMax flywheelMotor = new SparkMax(LAUNCHER_MOTOR_1_ID, 0, MotorType.kBrushless);
+    private final SparkMax flywheelMotorInverted = new SparkMax(LAUNCHER_MOTOR_2_ID, 0, MotorType.kBrushless);
 
     private final SparkMaxSim feederMotorSim;
     private final SparkMaxSim launcherMotorLeaderSim;
@@ -23,10 +23,10 @@ public class ShooterIOSim implements ShooterIO {
 
     // TODO: Find MOI (moment of inertia)
     private final FlywheelSim flywheelSim = new FlywheelSim(
-            LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00062156662, 1), DCMotor.getNEO(2));
+            Models.flywheelFromPhysicalConstants(DCMotor.getNEO(2), 0.00062156662, 1), DCMotor.getNEO(2));
 
     private final FlywheelSim feederSim = new FlywheelSim(
-            LinearSystemId.createFlywheelSystem(DCMotor.getNEO(1), 0.00062156662, 1), DCMotor.getNEO(1));
+            Models.flywheelFromPhysicalConstants(DCMotor.getNEO(1), 0.00062156662, 1), DCMotor.getNEO(1));
 
     public ShooterIOSim() {
         feederMotorSim = new SparkMaxSim(feederMotor, DCMotor.getNEO(1));
@@ -37,8 +37,8 @@ public class ShooterIOSim implements ShooterIO {
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
         updateSim();
-        inputs.flywheelRPM = flywheelSim.getAngularVelocityRPM();
-        inputs.feederRPM = feederSim.getAngularVelocityRPM();
+        inputs.flywheelRPM = flywheelMotor.getEncoder().getVelocity().get();
+        inputs.feederRPM = feederMotor.getEncoder().getVelocity().get();
     }
 
     private void updateSim() {
@@ -49,12 +49,12 @@ public class ShooterIOSim implements ShooterIO {
         feederSim.update(0.02);
 
         // Update motors
-        feederMotorSim.iterate(feederSim.getAngularVelocityRPM(), RoboRioSim.getVInVoltage(), 0.02);
-        launcherMotorLeaderSim.iterate(flywheelSim.getAngularVelocityRPM(), RoboRioSim.getVInVoltage(), 0.02);
-        launcherMotorFollowerSim.iterate(flywheelSim.getAngularVelocityRPM(), RoboRioSim.getVInVoltage(), 0.02);
+        feederMotorSim.iterate(feederSim.getAngularVelocity(), RoboRioSim.getVInVoltage(), 0.02);
+        launcherMotorLeaderSim.iterate(flywheelSim.getAngularVelocity(), RoboRioSim.getVInVoltage(), 0.02);
+        launcherMotorFollowerSim.iterate(flywheelSim.getAngularVelocity(), RoboRioSim.getVInVoltage(), 0.02);
 
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(
-                flywheelSim.getCurrentDrawAmps() + feederSim.getCurrentDrawAmps()));
+                flywheelSim.getCurrentDraw() + feederSim.getCurrentDraw()));
     }
 
     @Override

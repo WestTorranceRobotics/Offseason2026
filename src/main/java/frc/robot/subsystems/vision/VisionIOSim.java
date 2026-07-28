@@ -1,21 +1,23 @@
 package frc.robot.subsystems.vision;
 
-import static edu.wpi.first.units.Units.*;
 import static frc.robot.constants.VisionConstants.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import frc.robot.RobotContainer;
 import java.io.IOException;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonTargetSortMode;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.vision.apriltag.AprilTagFieldLayout;
+import org.wpilib.vision.apriltag.AprilTagFields;
+
+import frc.robot.RobotContainer;
 
 public class VisionIOSim implements VisionIO {
     private final VisionSystemSim visionSystemSim = new VisionSystemSim("main");
@@ -50,7 +52,7 @@ public class VisionIOSim implements VisionIO {
 
         try {
             visionSystemSim.addAprilTags(
-                    AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltWelded.m_resourceFile));
+                    AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltWelded.resourceFile));
         } catch (IOException ioe) {
             System.out.println("Failed to load april tag field");
         }

@@ -1,13 +1,13 @@
 package frc.robot.utilities.controller;
 
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.wpilib.command2.button.CommandNiDsPS4Controller;
+import org.wpilib.command2.button.Trigger;
 
 public class DualShock4Controller implements Controller {
-    private final CommandPS4Controller ps4Controller;
+    private final CommandNiDsPS4Controller ps4Controller;
 
     public DualShock4Controller(int port) {
-        ps4Controller = new CommandPS4Controller(port);
+        ps4Controller = new CommandNiDsPS4Controller(port);
     }
 
     @Override

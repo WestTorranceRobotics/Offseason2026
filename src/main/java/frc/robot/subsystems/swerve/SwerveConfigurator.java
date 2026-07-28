@@ -1,12 +1,7 @@
 package frc.robot.subsystems.swerve;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.constants.SwerveDriveConstants.RealRobotConstants;
 import frc.robot.constants.SwerveDriveConstants.RealRobotConstants.RealModuleConstants;
 import frc.robot.constants.SwerveDriveConstants.SimulatedControlSystemConstants.SimulatedModuleConstants;
@@ -15,7 +10,13 @@ import frc.robot.subsystems.swerve.module.ModuleIOReal;
 import frc.robot.subsystems.swerve.module.ModuleIOSim;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.Mass;
 
 public class SwerveConfigurator {
     public final SwerveDriveRobotConstants swerveDriveRobotConstants;
@@ -40,15 +41,15 @@ public class SwerveConfigurator {
         }
 
         if (moduleConstants.length < 4) {
-            DriverStation.reportWarning("Less than four modules were defined in the configurator", false);
+            DriverStationErrors.reportWarning("Less than four modules were defined in the configurator", false);
         }
 
         if (moduleConstants.length > 4) {
-            DriverStation.reportError("More than five modules were defined in the configurator", false);
+            DriverStationErrors.reportError("More than five modules were defined in the configurator", false);
         }
 
         if (swerveModuleCornerPositionSet.size() != moduleConstants.length) {
-            DriverStation.reportError("Duplicate swerve module positions were configured", false);
+            DriverStationErrors.reportError("Duplicate swerve module positions were configured", false);
         }
     }
 

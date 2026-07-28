@@ -1,10 +1,10 @@
 package frc.robot.subsystems.hopper;
 
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.units.measure.Voltage;
 
 public class Hopper extends SubsystemBase {
     private final HopperIO io;

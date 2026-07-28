@@ -3,11 +3,6 @@ package frc.robot.subsystems.vision;
 import static frc.robot.constants.VisionConstants.*;
 import static org.ironmaple.utils.FieldMirroringUtils.isSidePresentedAsRed;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.EstimateConsumer;
 import frc.robot.subsystems.vision.VisionIO.VisionIOInputs;
 import java.util.List;
@@ -16,6 +11,11 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.vision.apriltag.AprilTagFieldLayout;
+import org.wpilib.vision.apriltag.AprilTagFields;
 
 public class Vision extends SubsystemBase {
     private final VisionIO io;

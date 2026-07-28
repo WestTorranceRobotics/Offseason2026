@@ -1,18 +1,18 @@
 package frc.robot.subsystems.swerve.module;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Voltage;
 import frc.robot.subsystems.swerve.SwerveConfigurator;
 import org.littletonrobotics.junction.Logger;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.units.measure.Voltage;
 
 public class Module {
     private final ModuleIO io;
@@ -27,8 +27,8 @@ public class Module {
 
     private final String moduleName;
 
-    private final SwerveModuleState desiredState = new SwerveModuleState(0, new Rotation2d());
-    private final SwerveModuleState currentState = new SwerveModuleState(0, new Rotation2d());
+    private final SwerveModuleVelocity desiredState = new SwerveModuleVelocity(0, new Rotation2d());
+    private final SwerveModuleVelocity currentState = new SwerveModuleVelocity(0, new Rotation2d());
 
     private final SwerveModulePosition swerveModulePosition = new SwerveModulePosition();
 
@@ -63,29 +63,29 @@ public class Module {
         return new Rotation2d(inputs.steerAngleRad);
     }
 
-    public SwerveModuleState getState() {
+    public SwerveModuleVelocity getState() {
         currentState.angle = getSteerAngle();
-        currentState.speedMetersPerSecond = inputs.driveWheelVelocityRPS * robotConstants.wheelCircumference.in(Meters);
+        currentState.velocity = inputs.driveWheelVelocityRPS * robotConstants.wheelCircumference.in(Meters);
         return currentState;
     }
 
     public SwerveModulePosition getPosition() {
         swerveModulePosition.angle = getSteerAngle();
-        swerveModulePosition.distanceMeters =
+        swerveModulePosition.distance =
                 inputs.driveWheelPositionRotations * robotConstants.wheelCircumference.in(Meters);
         return swerveModulePosition;
     }
 
     public void setDesiredState(LinearVelocity speed, Rotation2d angle) {
         if (angle != null) {
-            this.desiredState.angle = angle;
+            desiredState.angle = angle;
         }
-        this.desiredState.speedMetersPerSecond = speed.in(MetersPerSecond);
-        this.steerPIDController.setSetpoint(this.desiredState.angle.getRadians());
-        this.drivePIDController.setSetpoint(this.desiredState.speedMetersPerSecond);
+        desiredState.velocity = speed.in(MetersPerSecond);
+        steerPIDController.setSetpoint(desiredState.angle.getRadians());
+        drivePIDController.setSetpoint(desiredState.velocity);
     }
 
-    public SwerveModuleState getDesiredState() {
+    public SwerveModuleVelocity getDesiredState() {
         return desiredState;
     }
 
@@ -109,7 +109,7 @@ public class Module {
         return Rotations.of(inputs.driveWheelPositionRotations);
     }
 
-    // TODO clamp any voltages sent to motors
+    // TODO: clamp any voltages sent to motors
     public Voltage getDriveVoltage() {
         return Volts.of(inputs.driveVoltage);
     }
@@ -127,6 +127,6 @@ public class Module {
 
         io.setDriveVoltage(Volts.of(drivePIDController.calculate(
                         inputs.driveWheelVelocityRPS * robotConstants.wheelCircumference.in(Meters))
-                + driveFeedforward.calculate(desiredState.speedMetersPerSecond)));
+                + driveFeedforward.calculate(desiredState.velocity)));
     }
 }

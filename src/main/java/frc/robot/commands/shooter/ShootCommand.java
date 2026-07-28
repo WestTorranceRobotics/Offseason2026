@@ -1,17 +1,17 @@
 package frc.robot.commands.shooter;
 
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.ShooterConstants.*;
 import static org.ironmaple.utils.FieldMirroringUtils.toCurrentAllianceTranslation;
+import static org.wpilib.units.Units.RPM;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.GlobalConstants.FieldConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.vision.Vision;
 import org.littletonrobotics.junction.Logger;
+import org.wpilib.command2.Command;
+import org.wpilib.math.geometry.Translation2d;
 
 public class ShootCommand extends Command {
     private final Shooter shooter;

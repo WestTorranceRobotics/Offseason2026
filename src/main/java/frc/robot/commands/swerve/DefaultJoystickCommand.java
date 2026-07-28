@@ -2,11 +2,11 @@ package frc.robot.commands.swerve;
 
 import static frc.robot.utilities.controller.InputProcessing.*;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.SwerveDriveConstants;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.function.DoubleSupplier;
+import org.wpilib.command2.Command;
+import org.wpilib.math.kinematics.ChassisVelocities;
 
 public class DefaultJoystickCommand extends Command {
     private final DoubleSupplier ly;
@@ -35,12 +35,12 @@ public class DefaultJoystickCommand extends Command {
      */
     @Override
     public void execute() {
-        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(
+        ChassisVelocities chassisVelocities = new ChassisVelocities(
                 -curve(applyDeadband(ly.getAsDouble())) * SwerveDriveConstants.MAX_TRANSLATION_SPEED,
                 -curve(applyDeadband(lx.getAsDouble())) * SwerveDriveConstants.MAX_TRANSLATION_SPEED,
                 -curve(applyDeadband(rx.getAsDouble())) * SwerveDriveConstants.MAX_ANGULAR_SPEED);
 
-        drive.drive(chassisSpeeds, true);
+        drive.drive(chassisVelocities, true);
     }
 
     /**
@@ -50,6 +50,6 @@ public class DefaultJoystickCommand extends Command {
      */
     @Override
     public void end(boolean interrupted) {
-        drive.drive(new ChassisSpeeds(), true);
+        drive.drive(new ChassisVelocities(), true);
     }
 }

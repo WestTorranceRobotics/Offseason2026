@@ -1,27 +1,12 @@
 package frc.robot.subsystems.swerve;
 
-import static edu.wpi.first.units.Units.*;
 import static org.ironmaple.utils.FieldMirroringUtils.isSidePresentedAsRed;
-import static org.ironmaple.utils.FieldMirroringUtils.toCurrentAllianceTranslation;
+import static org.wpilib.units.Units.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.GlobalConstants.FieldConstants;
 import frc.robot.constants.SwerveDriveConstants;
 import frc.robot.constants.SwerveDriveConstants.RealRobotConstants;
@@ -31,6 +16,20 @@ import frc.robot.subsystems.swerve.module.Module;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
 
 public class Swerve extends SubsystemBase {
     private final Gyro gyro;
@@ -72,7 +71,7 @@ public class Swerve extends SubsystemBase {
                 this::getPose,
                 this::setPose,
                 this::getChassisSpeed,
-                (ChassisSpeeds speeds) -> drive(speeds, false),
+                (ChassisVelocities speeds) -> drive(speeds, false),
                 new PPHolonomicDriveController(
                         new PIDConstants(
                                 RealRobotConstants.TRANSLATION_P,
@@ -88,21 +87,20 @@ public class Swerve extends SubsystemBase {
                 });
     }
 
-    public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
+    public void drive(ChassisVelocities chassisVelocities, boolean fieldRelative) {
         if (fieldRelative) {
             Rotation2d fieldRelativeHeading =
                     Rotation2d.fromRadians(getHeading().getRadians() + (isSidePresentedAsRed() ? Math.PI : 0));
-            Rotation2d skewCompensation = Rotation2d.fromRadians(
-                    chassisSpeeds.omegaRadiansPerSecond * SwerveDriveConstants.SKEW_COMPENSATION_FACTOR);
-            chassisSpeeds =
-                    ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, fieldRelativeHeading.plus(skewCompensation));
+            Rotation2d skewCompensation =
+                    Rotation2d.fromRadians(chassisVelocities.omega * SwerveDriveConstants.SKEW_COMPENSATION_FACTOR);
+            chassisVelocities = chassisVelocities.toRobotRelative(fieldRelativeHeading.plus(skewCompensation));
         }
-        calculateStates(chassisSpeeds);
+        calculateStates(chassisVelocities);
     }
 
     public Rotation2d getShootingAngle() {
         Translation2d robotTranslation = getPose().getTranslation();
-        Translation2d hubPosition = toCurrentAllianceTranslation(FieldConstants.BLUE_HUB_POSITION);
+        Translation2d hubPosition = FieldConstants.BLUE_HUB_POSITION;
 
         // Detect if we aren't in our alliance zone
         if ((hubPosition.getX() - robotTranslation.getX()) * (isSidePresentedAsRed() ? -1 : 1) < 0) {
@@ -133,25 +131,24 @@ public class Swerve extends SubsystemBase {
         swerveDrivePoseEstimator.update(gyro.getRotation(), getModulePositions());
     }
 
-    private void calculateStates(ChassisSpeeds chassisSpeeds) {
+    private void calculateStates(ChassisVelocities chassisVelocities) {
         Module[] modules = getModules();
 
-        chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
-        SwerveModuleState[] moduleStates = swerveDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        chassisVelocities = chassisVelocities.discretize(0.02);
+        SwerveModuleVelocity[] moduleVelocities = swerveDriveKinematics.toSwerveModuleVelocities(chassisVelocities);
 
         for (int i = 0; i < modules.length; i++) {
-            moduleStates[i].optimize(modules[i].getSteerAngle());
-            moduleStates[i].speedMetersPerSecond *=
-                    moduleStates[i].angle.minus(modules[i].getSteerAngle()).getCos();
+            SwerveModuleVelocity desiredVelocity = moduleVelocities[i].optimize(modules[i].getSteerAngle());
+            desiredVelocity = desiredVelocity.cosineScale(modules[i].getSteerAngle());
 
-            modules[i].setDesiredState(MetersPerSecond.of(moduleStates[i].speedMetersPerSecond), moduleStates[i].angle);
+            modules[i].setDesiredState(MetersPerSecond.of(desiredVelocity.velocity), desiredVelocity.angle);
             modules[i].tickPID();
         }
     }
 
-    public ChassisSpeeds getChassisSpeed() {
-        ChassisSpeeds chassisSpeeds = swerveDriveKinematics.toChassisSpeeds(getModuleStates());
-        return chassisSpeeds;
+    public ChassisVelocities getChassisSpeed() {
+        ChassisVelocities chassisVelocities = swerveDriveKinematics.toChassisVelocities(getModuleStates());
+        return chassisVelocities;
     }
 
     @AutoLogOutput(key = "Swerve/Odometry")
@@ -181,15 +178,15 @@ public class Swerve extends SubsystemBase {
     }
 
     @AutoLogOutput(key = "Swerve/Current Module States")
-    public SwerveModuleState[] getModuleStates() {
-        return new SwerveModuleState[] {
+    public SwerveModuleVelocity[] getModuleStates() {
+        return new SwerveModuleVelocity[] {
             frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState()
         };
     }
 
     @AutoLogOutput(key = "Swerve/Desired Module States")
-    public SwerveModuleState[] getDesiredModuleStates() {
-        return new SwerveModuleState[] {
+    public SwerveModuleVelocity[] getDesiredModuleStates() {
+        return new SwerveModuleVelocity[] {
             frontLeft.getDesiredState(),
             frontRight.getDesiredState(),
             backLeft.getDesiredState(),

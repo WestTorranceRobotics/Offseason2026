@@ -1,9 +1,9 @@
 package frc.robot.constants;
 
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import java.util.Set;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Translation3d;
 
 public class VisionConstants {
     public static final String CAMERA_NAME = "Arducam_OV9281_USB_Camera";

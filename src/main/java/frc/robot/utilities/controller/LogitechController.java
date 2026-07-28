@@ -1,8 +1,9 @@
 package frc.robot.utilities.controller;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.wpilib.command2.button.CommandGenericHID;
+import org.wpilib.command2.button.Trigger;
+import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.POVDirection;
 
 public class LogitechController extends CommandGenericHID implements Controller {
     private GenericHID controller;
@@ -53,19 +54,19 @@ public class LogitechController extends CommandGenericHID implements Controller 
     }
 
     public Trigger dPadLeft() {
-        return new Trigger(() -> (controller.getPOV() == 270));
+        return new Trigger(() -> controller.getPOV() == POVDirection.LEFT);
     }
 
     public Trigger dPadUp() {
-        return new Trigger(() -> (controller.getPOV() == 0));
+        return new Trigger(() -> controller.getPOV() == POVDirection.UP);
     }
 
     public Trigger dPadRight() {
-        return new Trigger(() -> (controller.getPOV() == 90));
+        return new Trigger(() -> controller.getPOV() == POVDirection.RIGHT);
     }
 
     public Trigger dPadDown() {
-        return new Trigger(() -> (controller.getPOV() == 180));
+        return new Trigger(() -> controller.getPOV() == POVDirection.DOWN);
     }
 
     public Trigger R1() {
