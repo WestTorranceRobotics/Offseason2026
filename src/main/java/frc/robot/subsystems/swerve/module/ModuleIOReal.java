@@ -53,7 +53,7 @@ public class ModuleIOReal implements ModuleIO {
         driveMotorConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
 
         // Azimuth motor config
-         // TODO: set IDs!!
+        // TODO: set IDs!!
         steerMotorController = new SparkMax(moduleConstants.azimuthMotorID, 0, SparkMax.MotorType.kBrushless);
         SparkMaxConfig sparkMaxConfig = new SparkMaxConfig();
         sparkMaxConfig

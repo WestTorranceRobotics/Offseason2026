@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swerve;
 
 import static org.ironmaple.utils.FieldMirroringUtils.isSidePresentedAsRed;
+import static org.ironmaple.utils.FieldMirroringUtils.toCurrentAllianceTranslation;
 import static org.wpilib.units.Units.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -100,7 +101,7 @@ public class Swerve extends SubsystemBase {
 
     public Rotation2d getShootingAngle() {
         Translation2d robotTranslation = getPose().getTranslation();
-        Translation2d hubPosition = FieldConstants.BLUE_HUB_POSITION;
+        Translation2d hubPosition = toCurrentAllianceTranslation(FieldConstants.BLUE_HUB_POSITION);
 
         // Detect if we aren't in our alliance zone
         if ((hubPosition.getX() - robotTranslation.getX()) * (isSidePresentedAsRed() ? -1 : 1) < 0) {

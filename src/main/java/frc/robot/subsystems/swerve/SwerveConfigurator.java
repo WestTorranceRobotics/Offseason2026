@@ -10,7 +10,6 @@ import frc.robot.subsystems.swerve.module.ModuleIOReal;
 import frc.robot.subsystems.swerve.module.ModuleIOSim;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.math.geometry.Rotation2d;

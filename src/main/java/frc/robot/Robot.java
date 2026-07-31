@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.firecontrol.FuelPhysicsSim;
 import frc.robot.constants.GlobalConstants;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt3D;
@@ -17,10 +18,11 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 
 public class Robot extends LoggedRobot {
-    private final RobotContainer m_robotContainer;
+    private final RobotContainer robotContainer;
     private Command autonomousCommand;
 
     public static SimulatedArena3D arena = new Arena2026Rebuilt3D();
+    public static FuelPhysicsSim fuelSim = new FuelPhysicsSim("Sim/Fuel");
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -51,7 +53,7 @@ public class Robot extends LoggedRobot {
 
         Logger.start();
 
-        m_robotContainer = new RobotContainer();
+        robotContainer = new RobotContainer();
     }
 
     /**
@@ -71,7 +73,7 @@ public class Robot extends LoggedRobot {
 
     /** This function is called once each time the robot enters Disabled mode. */
     public void disabledInit() {
-        m_robotContainer.clearModuleStates();
+        robotContainer.clearModuleStates();
     }
 
     public void disabledPeriodic() {}
@@ -82,7 +84,7 @@ public class Robot extends LoggedRobot {
      * Schedules autonomous command
      */
     public void autonomousInit() {
-        autonomousCommand = m_robotContainer.getAutonomousCommand();
+        autonomousCommand = robotContainer.getAutonomousCommand();
 
         if (autonomousCommand != null) {
             CommandScheduler.getInstance().schedule(autonomousCommand);
@@ -112,10 +114,14 @@ public class Robot extends LoggedRobot {
     public void testPeriodic() {}
 
     /** This function is called once when the robot is first started up. */
-    public void simulationInit() {}
+    public void simulationInit() {
+        fuelSim.enable();
+        fuelSim.placeFieldBalls();
+    }
 
     /** This function is called periodically whilst in simulation. */
     public void simulationPeriodic() {
         arena.simulationPeriodic();
+        fuelSim.tick();
     }
 }

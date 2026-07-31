@@ -59,8 +59,12 @@ public class IntakeIOSim implements IntakeIO {
         pivotSim.update(0.02);
 
         // Update motors
-        intakeMotorSim.iterate(rollerSim.getAngularVelocity(), RoboRioSim.getVInVoltage(), 0.02);
-        pivotMotorSim.iterate(pivotSim.getVelocity(), RoboRioSim.getVInVoltage(), 0.02);
+        intakeMotorSim.iterate(
+                Units.radiansPerSecondToRotationsPerMinute(rollerSim.getAngularVelocity()),
+                RoboRioSim.getVInVoltage(),
+                0.02);
+        pivotMotorSim.iterate(
+                Units.radiansPerSecondToRotationsPerMinute(pivotSim.getVelocity()), RoboRioSim.getVInVoltage(), 0.02);
 
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(
                 rollerSim.getCurrentDraw() + pivotSim.getCurrentDraw()));

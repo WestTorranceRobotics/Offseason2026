@@ -67,4 +67,8 @@ public class Shooter extends SubsystemBase {
     public void setFeederVoltage(Voltage voltage) {
         io.setFeederVoltage(voltage);
     }
+
+    public double getFeederRPM() {
+        return inputs.feederRPM;
+    }
 }

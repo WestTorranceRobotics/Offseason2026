@@ -14,10 +14,8 @@ public class ModuleIOSim implements ModuleIO {
     public ModuleIOSim(SwerveModuleSimulation swerveModuleSimulation) {
         this.swerveModuleSimulation = swerveModuleSimulation;
         this.driveMotor =
-                swerveModuleSimulation.useGenericMotorControllerForDrive()
-                        .withCurrentLimit(Amps.of(80));
-        this.steerMotor = swerveModuleSimulation.useGenericControllerForSteer()
-                        .withCurrentLimit(Amps.of(20));
+                swerveModuleSimulation.useGenericMotorControllerForDrive().withCurrentLimit(Amps.of(80));
+        this.steerMotor = swerveModuleSimulation.useGenericControllerForSteer().withCurrentLimit(Amps.of(20));
     }
 
     @Override

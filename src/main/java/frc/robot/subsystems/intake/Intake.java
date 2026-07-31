@@ -36,4 +36,8 @@ public class Intake extends SubsystemBase {
     public void stopPivot() {
         io.setPivotVoltage(Volts.of(0));
     }
+
+    public boolean isIntaking() {
+        return inputs.intakeRPM > 0;
+    }
 }

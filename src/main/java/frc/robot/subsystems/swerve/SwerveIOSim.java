@@ -2,14 +2,14 @@ package frc.robot.subsystems.swerve;
 
 import static org.wpilib.units.Units.*;
 
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Pose3d;
-import org.wpilib.math.geometry.Rotation2d;
 import frc.robot.Robot;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
 
 public class SwerveIOSim implements SwerveDriveIO {
     private final SwerveDriveSimulation3D swerveDriveSimulation;

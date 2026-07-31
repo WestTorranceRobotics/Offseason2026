@@ -7,7 +7,7 @@ public final class ShooterConstants {
     public static final int LAUNCHER_MOTOR_1_ID = 22;
     public static final int LAUNCHER_MOTOR_2_ID = 3;
 
-    // current limit values for shooter motors
+    // Current limit values for shooter motors
     public static final int FEEDER_MOTOR_CURRENT_LIMIT = 40;
     public static final int LAUNCHER_MOTOR_CURRENT_LIMIT = 50;
 
@@ -15,7 +15,18 @@ public final class ShooterConstants {
 
     public static final double LATENCY_COMPENSATION = 0; // TODO tune latency compensation
 
-    public static final double TOLERANCE_TO_RUN_FEEDER = 100;
+    public static final double TOLERANCE_TO_RUN_FEEDER = 200;
+
+    // Shooter mount position relative to robot center
+    public static final double SHOOTER_X_OFFSET = -0.30;
+    public static final double SHOOTER_Y_OFFSET = 0.0;
+    public static final double SHOOTER_Z_OFFSET = 0.30;
+
+    // Launch angle in radians (I think it's either 55 or 60)
+    public static final double LAUNCH_ANGLE = Math.toRadians(60.0);
+
+    // Rough conversion from flywheel RPM to ball exit velocity
+    public static final double RPM_TO_EXIT_VELOCITY = 0.002;
 
     public static final double YAW_ACCEPTABLE_ERROR = 2;
 

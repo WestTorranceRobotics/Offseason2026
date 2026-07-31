@@ -3,8 +3,8 @@ package frc.robot.subsystems.vision;
 import static frc.robot.constants.VisionConstants.*;
 import static org.wpilib.units.Units.*;
 
+import frc.robot.RobotContainer;
 import java.io.IOException;
-
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonTargetSortMode;
 import org.photonvision.simulation.PhotonCameraSim;
@@ -16,8 +16,6 @@ import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.vision.apriltag.AprilTagFieldLayout;
 import org.wpilib.vision.apriltag.AprilTagFields;
-
-import frc.robot.RobotContainer;
 
 public class VisionIOSim implements VisionIO {
     private final VisionSystemSim visionSystemSim = new VisionSystemSim("main");

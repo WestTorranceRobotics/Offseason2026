@@ -37,12 +37,13 @@ import frc.robot.subsystems.vision.VisionIOSim;
 import frc.robot.utilities.controller.Controller;
 import frc.robot.utilities.controller.DualShock4Controller;
 import frc.robot.utilities.controller.LogitechController;
-
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 
 /**
@@ -76,7 +77,6 @@ public class RobotContainer {
     public RobotContainer() {
         if (Robot.isReal()) {
             swerveDrive = new Swerve(new SwerveIOReal(), new GyroIOReal(), SwerveConfigurator.createRealModules());
-
             shooter = new Shooter(new ShooterIOReal());
             intake = new Intake(new IntakeIOReal());
             hopper = new Hopper(new HopperIOReal());
@@ -94,6 +94,33 @@ public class RobotContainer {
             intake = new Intake(new IntakeIOSim());
             hopper = new Hopper(new HopperIOSim());
             vision = new Vision(new VisionIOSim(), swerveDrive::addVisionMeasurement);
+
+            // Move everything to a sim handler file?
+            Robot.fuelSim.configureRobot(
+                    0.6223,
+                    0.762,
+                    0.1143,
+                    swerveDriveSimulation::getSimulatedDriveTrainPose,
+                    swerveDrive::getChassisSpeed);
+            Robot.fuelSim.addIntakeZone(-0.45, -0.10, -0.20, 0.20, intake::isIntaking);
+            Robot.fuelSim.configureHopper(
+                    45,
+                    0.005,
+                    0.1,
+                    new Translation2d(0, 0),
+                    new Translation3d(
+                            ShooterConstants.SHOOTER_X_OFFSET,
+                            ShooterConstants.SHOOTER_Y_OFFSET,
+                            ShooterConstants.SHOOTER_Z_OFFSET),
+                    false,
+                    0.4,
+                    0.5,
+                    0.25,
+                    0.5,
+                    0.3,
+                    3,
+                    hopper::getHopperRPM,
+                    shooter::getFeederRPM);
         }
 
         controller = new DualShock4Controller(OperatorConstants.DRIVER_CONTROLLER_PORT);

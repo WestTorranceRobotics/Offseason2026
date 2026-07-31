@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.Models;
+import org.wpilib.math.util.Units;
 import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.simulation.RoboRioSim;
@@ -35,7 +36,10 @@ public class HopperIOSim implements HopperIO {
         flywheelSim.update(0.02);
 
         // Update motor
-        hopperMotorSim.iterate(flywheelSim.getAngularVelocity(), RoboRioSim.getVInVoltage(), 0.02);
+        hopperMotorSim.iterate(
+                Units.radiansPerSecondToRotationsPerMinute(flywheelSim.getAngularVelocity()),
+                RoboRioSim.getVInVoltage(),
+                0.02);
 
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(flywheelSim.getCurrentDraw()));
     }

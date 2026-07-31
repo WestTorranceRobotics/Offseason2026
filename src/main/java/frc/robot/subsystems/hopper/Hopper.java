@@ -28,4 +28,8 @@ public class Hopper extends SubsystemBase {
     public void stopHopper() {
         io.setRollerVoltage(Volts.of(0));
     }
+
+    public double getHopperRPM() {
+        return inputs.hopperRPM;
+    }
 }
