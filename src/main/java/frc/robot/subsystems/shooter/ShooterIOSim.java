@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkMax;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
+import java.util.Random;
 import java.util.function.Supplier;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
@@ -21,7 +22,7 @@ import org.wpilib.simulation.RoboRioSim;
 import org.wpilib.units.measure.Voltage;
 
 public class ShooterIOSim implements ShooterIO {
-    private static final double FLYWHEEL_SHOT_DIP_RPM = 300.0; // RPM lost per shot (compression)
+    private static final double FLYWHEEL_SHOT_DIP_RPM = new Random().nextInt(500) + 201; // RPM lost per shot (compression)
 
     private final SparkMax feederMotor = new SparkMax(FEEDER_MOTOR_ID, 0, MotorType.kBrushless);
     private final SparkMax flywheelMotor = new SparkMax(LAUNCHER_MOTOR_1_ID, 0, MotorType.kBrushless);
