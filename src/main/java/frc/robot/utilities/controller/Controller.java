@@ -29,6 +29,11 @@ public interface Controller {
     double getRightAnalogTrigger();
 
     /**
+     * @Trigger The amount of hold on the left analog trigger.
+     */
+    double getLeftAnalogTrigger();
+
+    /**
      * @Trigger Triggers when the bottom button is pressed.
      */
     Trigger aOrCross();
@@ -67,6 +72,11 @@ public interface Controller {
      * @Trigger Triggers when the down d-pad button is pressed.
      */
     Trigger dPadDown();
+
+    /**
+     * @Trigger Triggers when left bumper button is pressed.
+     */
+    Trigger leftBumper();
 
     /**
      * @Trigger Triggers a zero of the swerve on the right analog trigger.

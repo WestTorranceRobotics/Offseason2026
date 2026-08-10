@@ -33,48 +33,63 @@ public class LogitechController extends CommandGenericHID implements Controller 
         return -controller.getRawAxis(5);
     }
 
+    @Override
     public double getRightAnalogTrigger() {
         return controller.getRawAxis(3);
     }
 
+    @Override
+    public double getLeftAnalogTrigger() {
+        return controller.getRawAxis(2);
+    }
+
+    @Override
     public Trigger aOrCross() {
         return new Trigger(() -> controller.getRawButton(1));
     }
 
+    @Override
     public Trigger bOrCircle() {
         return new Trigger(() -> controller.getRawButton(2));
     }
 
+    @Override
     public Trigger yOrTriangle() {
         return new Trigger(() -> controller.getRawButton(4));
     }
 
+    @Override
     public Trigger xOrSquare() {
         return new Trigger(() -> controller.getRawButton(3));
     }
 
+    @Override
     public Trigger dPadLeft() {
         return new Trigger(() -> controller.getPOV() == POVDirection.LEFT);
     }
 
+    @Override
     public Trigger dPadUp() {
         return new Trigger(() -> controller.getPOV() == POVDirection.UP);
     }
 
+    @Override
     public Trigger dPadRight() {
         return new Trigger(() -> controller.getPOV() == POVDirection.RIGHT);
     }
 
+    @Override
     public Trigger dPadDown() {
         return new Trigger(() -> controller.getPOV() == POVDirection.DOWN);
     }
 
-    public Trigger R1() {
-        return new Trigger(() -> controller.getRawButton(6));
+    @Override
+    public Trigger leftBumper() {
+        return new Trigger(() -> controller.getRawButton(5));
     }
 
     @Override
     public Trigger zero() {
-        return this.R1();
+        return new Trigger(() -> controller.getRawButton(6));
     }
 }

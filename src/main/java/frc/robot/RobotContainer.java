@@ -42,6 +42,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
+import org.wpilib.command2.button.Trigger;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.kinematics.ChassisVelocities;
@@ -166,8 +167,8 @@ public class RobotContainer {
                 .whileTrue(
                         new AlignCommand(controller::getLeftX, controller::getLeftY, vision::getYawOfHub, swerveDrive));
 
-        controller.xOrSquare().toggleOnTrue(new IntakeCommand(intake));
-        controller.yOrTriangle().toggleOnTrue(new OutakeCommand(intake));
+        new Trigger(() -> controller.getLeftAnalogTrigger() > 0.5).whileTrue(new IntakeCommand(intake));
+        controller.leftBumper().whileTrue(new OutakeCommand(intake));
 
         controller.dPadUp().whileTrue(new PivotUpCommand(intake));
         controller.dPadDown().whileTrue(new PivotDownCommand(intake));
