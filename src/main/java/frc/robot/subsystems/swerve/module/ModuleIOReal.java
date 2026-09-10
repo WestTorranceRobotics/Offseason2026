@@ -54,7 +54,7 @@ public class ModuleIOReal implements ModuleIO {
 
         // Azimuth motor config
         // TODO: set IDs!!
-        steerMotorController = new SparkMax(moduleConstants.azimuthMotorID, 0, SparkMax.MotorType.kBrushless);
+        steerMotorController = new SparkMax(0, moduleConstants.azimuthMotorID, SparkMax.MotorType.kBrushless);
         SparkMaxConfig sparkMaxConfig = new SparkMaxConfig();
         sparkMaxConfig
                 .smartCurrentLimit(40)

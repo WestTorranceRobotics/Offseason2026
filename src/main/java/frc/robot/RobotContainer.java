@@ -156,16 +156,19 @@ public class RobotContainer {
         controller.zero().onTrue(Commands.runOnce(swerveDrive::zeroHeading));
 
         // shooter button mapping
+        // controller
+        //         .aOrCross()
+        //         .whileTrue(new AlignAndShootCommand(
+        //                 controller::getLeftX, controller::getLeftY, swerveDrive, shooter, intake, hopper, vision));
         controller
                 .aOrCross()
-                .whileTrue(new AlignAndShootCommand(
-                        controller::getLeftX, controller::getLeftY, swerveDrive, shooter, intake, hopper, vision));
+                .whileTrue(new OverrideShootCommand(shooter, intake, hopper, 2500.0));
 
         // align button mapping
-        controller
-                .bOrCircle()
-                .whileTrue(
-                        new AlignCommand(controller::getLeftX, controller::getLeftY, vision::getYawOfHub, swerveDrive));
+        // controller
+        //         .bOrCircle()
+        //         .whileTrue(
+        //                 new AlignCommand(controller::getLeftX, controller::getLeftY, vision::getYawOfHub, swerveDrive));
 
         new Trigger(() -> controller.getLeftAnalogTrigger() > 0.5).whileTrue(new IntakeCommand(intake));
         controller.leftBumper().whileTrue(new OutakeCommand(intake));

@@ -3,13 +3,13 @@ package frc.robot.constants;
 import org.wpilib.math.interpolation.InterpolatingDoubleTreeMap;
 
 public final class ShooterConstants {
-    public static final int FEEDER_MOTOR_ID = 49;
-    public static final int LAUNCHER_MOTOR_1_ID = 22;
-    public static final int LAUNCHER_MOTOR_2_ID = 3;
+    public static final int FEEDER_MOTOR_ID = 22;
+    public static final int SHOOTER_MOTOR_1_ID = 3;
+    public static final int SHOOTER_MOTOR_2_ID = 9;
 
     // Current limit values for shooter motors
     public static final int FEEDER_MOTOR_CURRENT_LIMIT = 40;
-    public static final int LAUNCHER_MOTOR_CURRENT_LIMIT = 50;
+    public static final int SHOOTER_MOTOR_CURRENT_LIMIT = 50;
 
     public static final double FEEDER_VOLTAGE = 12;
 

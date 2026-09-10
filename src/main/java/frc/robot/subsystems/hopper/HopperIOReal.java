@@ -11,7 +11,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import org.wpilib.units.measure.Voltage;
 
 public class HopperIOReal implements HopperIO {
-    private final SparkMax hopperMotor = new SparkMax(HOPPER_MOTOR_ID, 0, MotorType.kBrushless);
+    private final SparkMax hopperMotor = new SparkMax(2, HOPPER_MOTOR_ID, MotorType.kBrushless);
 
     public HopperIOReal() {
         SparkMaxConfig hopperConfig = new SparkMaxConfig();

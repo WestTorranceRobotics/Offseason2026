@@ -14,7 +14,7 @@ import org.wpilib.simulation.RoboRioSim;
 import org.wpilib.units.measure.Voltage;
 
 public class HopperIOSim implements HopperIO {
-    private final SparkMax hopperMotor = new SparkMax(HOPPER_MOTOR_ID, 0, MotorType.kBrushless);
+    private final SparkMax hopperMotor = new SparkMax(2, HOPPER_MOTOR_ID, MotorType.kBrushless);
     private final SparkMaxSim hopperMotorSim;
 
     // TODO: Find MOI (moment of inertia)

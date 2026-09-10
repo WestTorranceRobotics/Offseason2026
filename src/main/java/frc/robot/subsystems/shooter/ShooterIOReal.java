@@ -11,9 +11,9 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import org.wpilib.units.measure.Voltage;
 
 public class ShooterIOReal implements ShooterIO {
-    private final SparkMax feederMotor = new SparkMax(FEEDER_MOTOR_ID, 0, MotorType.kBrushless);
-    private final SparkMax flywheelMotor = new SparkMax(LAUNCHER_MOTOR_1_ID, 0, MotorType.kBrushless);
-    private final SparkMax flywheelMotorInverted = new SparkMax(LAUNCHER_MOTOR_2_ID, 0, MotorType.kBrushless);
+    private final SparkMax feederMotor = new SparkMax(1, FEEDER_MOTOR_ID, MotorType.kBrushless);
+    private final SparkMax flywheelMotor = new SparkMax(1, SHOOTER_MOTOR_1_ID, MotorType.kBrushless);
+    private final SparkMax flywheelMotorInverted = new SparkMax(1, SHOOTER_MOTOR_2_ID, MotorType.kBrushless);
 
     public ShooterIOReal() {
         // feeder config
@@ -25,7 +25,7 @@ public class ShooterIOReal implements ShooterIO {
         // launcher motor configs
         SparkMaxConfig flywheelConfig = new SparkMaxConfig();
         flywheelConfig.idleMode(IdleMode.kCoast);
-        flywheelConfig.smartCurrentLimit(LAUNCHER_MOTOR_CURRENT_LIMIT);
+        flywheelConfig.smartCurrentLimit(SHOOTER_MOTOR_CURRENT_LIMIT);
         flywheelConfig.inverted(false);
         flywheelMotor.configure(flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
