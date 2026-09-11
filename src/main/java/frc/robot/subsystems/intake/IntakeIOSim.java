@@ -15,8 +15,8 @@ import org.wpilib.simulation.SingleJointedArmSim;
 import org.wpilib.units.measure.Voltage;
 
 public class IntakeIOSim implements IntakeIO {
-    private final SparkMax intakeMotor = new SparkMax(2, INTAKE_MOTOR_ID, MotorType.kBrushless);
-    private final SparkMax pivotMotor = new SparkMax(2, PIVOT_MOTOR_ID, MotorType.kBrushless);
+    private final SparkMax intakeMotor = new SparkMax(0, INTAKE_MOTOR_ID, MotorType.kBrushless);
+    private final SparkMax pivotMotor = new SparkMax(0, PIVOT_MOTOR_ID, MotorType.kBrushless);
 
     private final SparkMaxSim intakeMotorSim;
     private final SparkMaxSim pivotMotorSim;

@@ -11,8 +11,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import org.wpilib.units.measure.Voltage;
 
 public class IntakeIOReal implements IntakeIO {
-    private final SparkMax intakeMotor = new SparkMax(2, INTAKE_MOTOR_ID, MotorType.kBrushless);
-    private final SparkMax pivotMotor = new SparkMax(2, PIVOT_MOTOR_ID, MotorType.kBrushless);
+    private final SparkMax intakeMotor = new SparkMax(0, INTAKE_MOTOR_ID, MotorType.kBrushless);
+    private final SparkMax pivotMotor = new SparkMax(0, PIVOT_MOTOR_ID, MotorType.kBrushless);
 
     public IntakeIOReal() {
         SparkMaxConfig intakeConfig = new SparkMaxConfig();
