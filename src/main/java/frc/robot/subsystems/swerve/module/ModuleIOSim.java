@@ -31,6 +31,8 @@ public class ModuleIOSim implements ModuleIO {
         inputs.steerAngleRad = swerveModuleSimulation.getSteerAbsoluteFacing().getRadians();
         inputs.steerVelocityRadPerSec =
                 swerveModuleSimulation.getSteerAbsoluteEncoderSpeed().in(RadiansPerSecond);
+
+        inputs.driveCurrent = swerveModuleSimulation.getDriveMotorSupplyCurrent().in(Amps);
     }
 
     @Override

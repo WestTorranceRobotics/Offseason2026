@@ -21,8 +21,8 @@ public class Robot extends LoggedRobot {
     private final RobotContainer robotContainer;
     private Command autonomousCommand;
 
-    public static SimulatedArena3D arena = new Arena2026Rebuilt3D();
-    public static FuelPhysicsSim fuelSim = new FuelPhysicsSim("Sim/Fuel");
+    public static SimulatedArena3D arena;
+    public static FuelPhysicsSim fuelSim;
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -42,6 +42,8 @@ public class Robot extends LoggedRobot {
             case SIM:
                 // Logger.addDataReceiver(new WPILOGWriter(".")); // Log to current directory
                 Logger.addDataReceiver(new NT4Publisher());
+                arena = new Arena2026Rebuilt3D();
+                fuelSim = new FuelPhysicsSim("Sim/Fuel");
                 break;
             case REPLAY:
                 setUseTiming(false);

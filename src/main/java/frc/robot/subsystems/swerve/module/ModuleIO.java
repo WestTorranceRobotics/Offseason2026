@@ -14,6 +14,8 @@ public interface ModuleIO {
 
         public double steerAngleRad = 0;
         public double steerVelocityRadPerSec = 0;
+
+        public double driveCurrent = 0;
     }
 
     /**

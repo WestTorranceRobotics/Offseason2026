@@ -12,9 +12,7 @@ import frc.robot.commands.intake.PivotDownCommand;
 import frc.robot.commands.intake.PivotUpCommand;
 import frc.robot.commands.shooter.AlignAndShootCommand;
 import frc.robot.commands.shooter.OverrideShootCommand;
-import frc.robot.commands.swerve.AlignCommand;
 import frc.robot.commands.swerve.DefaultJoystickCommand;
-import frc.robot.constants.GlobalConstants.OperatorConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.hopper.HopperIOReal;
@@ -34,14 +32,12 @@ import frc.robot.subsystems.swerve.gyro.GyroIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIOReal;
 import frc.robot.subsystems.vision.VisionIOSim;
-import frc.robot.utilities.controller.Controller;
-import frc.robot.utilities.controller.DualShock4Controller;
-import frc.robot.utilities.controller.LogitechController;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
+import org.wpilib.command2.button.CommandGamepad;
 import org.wpilib.command2.button.Trigger;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
@@ -62,8 +58,8 @@ public class RobotContainer {
     private final Intake intake;
     private final Hopper hopper;
 
-    private final Controller controller;
-    private final Controller overrideController;
+	private final CommandGamepad controller = new CommandGamepad(0);
+    private final CommandGamepad overrideController = new CommandGamepad(1);
 
     public static SwerveDriveSimulation3D swerveDriveSimulation;
 
@@ -124,11 +120,7 @@ public class RobotContainer {
                     shooter::getFeederRPM);
         }
 
-        controller = new DualShock4Controller(OperatorConstants.DRIVER_CONTROLLER_PORT);
-        overrideController = new LogitechController(OperatorConstants.OVERRIDE_CONTROLLER_PORT);
-
         registerNamedCommands();
-
         autoChooser = new LoggedDashboardChooser<>(
                 "Auto Routine",
                 AutoBuilder.buildAutoChooserWithOptionsModifier(
@@ -153,38 +145,38 @@ public class RobotContainer {
                 controller::getLeftX, controller::getLeftY, controller::getRightX, swerveDrive));
 
         // reset the heading of the swerve
-        controller.zero().onTrue(Commands.runOnce(swerveDrive::zeroHeading));
+        controller.rightBumper().onTrue(Commands.runOnce(swerveDrive::zeroHeading));
 
         // shooter button mapping
         // controller
-        //         .aOrCross()
+        //         .southFace()
         //         .whileTrue(new AlignAndShootCommand(
         //                 controller::getLeftX, controller::getLeftY, swerveDrive, shooter, intake, hopper, vision));
         controller
-                .aOrCross()
+                .southFace()
                 .whileTrue(new OverrideShootCommand(shooter, intake, hopper, 2500.0));
 
         // align button mapping
         // controller
-        //         .bOrCircle()
+        //         .eastFace()
         //         .whileTrue(
         //                 new AlignCommand(controller::getLeftX, controller::getLeftY, vision::getYawOfHub, swerveDrive));
 
-        new Trigger(() -> controller.getLeftAnalogTrigger() > 0.5).whileTrue(new IntakeCommand(intake));
+        new Trigger(() -> controller.getLeftTriggerAxis() > 0.5).whileTrue(new IntakeCommand(intake));
         controller.leftBumper().whileTrue(new OutakeCommand(intake));
 
-        controller.dPadUp().whileTrue(new PivotUpCommand(intake));
-        controller.dPadDown().whileTrue(new PivotDownCommand(intake));
+        controller.povUp().whileTrue(new PivotUpCommand(intake));
+        controller.povDown().whileTrue(new PivotDownCommand(intake));
 
         overrideController
-                .aOrCross()
+                .southFace()
                 .whileTrue(new OverrideShootCommand(shooter, intake, hopper, ShooterConstants.MINIMUM_SHOOTER_RPM));
 
-        overrideController.bOrCircle().whileTrue(new OverrideShootCommand(shooter, intake, hopper, 3200.0));
+        overrideController.eastFace().whileTrue(new OverrideShootCommand(shooter, intake, hopper, 3200.0));
 
-        overrideController.xOrSquare().whileTrue(new OverrideShootCommand(shooter, intake, hopper, 3700.0));
+        overrideController.westFace().whileTrue(new OverrideShootCommand(shooter, intake, hopper, 3700.0));
 
-        overrideController.yOrTriangle().whileTrue(new OverrideShootCommand(shooter, intake, hopper, 4200.0));
+        overrideController.northFace().whileTrue(new OverrideShootCommand(shooter, intake, hopper, 4200.0));
     }
 
     /**

@@ -1,9 +1,10 @@
 package frc.robot.commands.swerve;
 
-import static frc.robot.utilities.controller.InputProcessing.*;
-
 import frc.robot.constants.SwerveDriveConstants;
 import frc.robot.subsystems.swerve.Swerve;
+
+import static frc.robot.utilities.InputProcessing.*;
+
 import java.util.function.DoubleSupplier;
 import org.wpilib.command2.Command;
 import org.wpilib.math.controller.PIDController;

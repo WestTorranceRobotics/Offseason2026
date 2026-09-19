@@ -1,4 +1,4 @@
-package frc.robot.utilities.controller;
+package frc.robot.utilities;
 
 import static frc.robot.constants.GlobalConstants.OperatorConstants.DEADBAND_THRESHOLD;
 

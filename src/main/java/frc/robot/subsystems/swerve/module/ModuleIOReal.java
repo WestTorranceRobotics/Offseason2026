@@ -53,7 +53,6 @@ public class ModuleIOReal implements ModuleIO {
         driveMotorConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
 
         // Azimuth motor config
-        // TODO: set IDs!!
         steerMotorController = new SparkMax(0, moduleConstants.azimuthMotorID, SparkMax.MotorType.kBrushless);
         SparkMaxConfig sparkMaxConfig = new SparkMaxConfig();
         sparkMaxConfig
@@ -89,6 +88,8 @@ public class ModuleIOReal implements ModuleIO {
 
         inputs.steerAngleRad = new Rotation2d(CANCoder.getAbsolutePosition().getValue()).getRadians();
         inputs.steerVelocityRadPerSec = CANCoder.getVelocity().getValue().in(RadiansPerSecond);
+
+        inputs.driveCurrent = driveMotorController.getTorqueCurrent().getValueAsDouble();
     }
 
     @Override

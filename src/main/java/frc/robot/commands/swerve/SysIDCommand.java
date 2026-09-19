@@ -5,11 +5,13 @@ import static org.wpilib.units.Units.Second;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.units.Units.Volts;
 
+import java.lang.ModuleLayer.Controller;
+
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.module.Module;
-import frc.robot.utilities.controller.Controller;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.wpilib.command2.Command;
+import org.wpilib.command2.button.CommandGamepad;
 import org.wpilib.command2.sysid.SysIdRoutine;
 import org.wpilib.sysid.SysIdRoutineLog;
 import org.wpilib.units.measure.Angle;
@@ -20,18 +22,17 @@ public class SysIDCommand extends Command {
     private Routine routineType;
     private final Module[] modules;
     private SysIdRoutine routine;
-    private final Controller controller;
+    private final CommandGamepad controller = new CommandGamepad(0);
 
     private final LoggedDashboardChooser<Routine> sendableChooser;
 
     private final DefaultJoystickCommand defaultJoystickCommand;
 
-    public SysIDCommand(Swerve swerveDrive, Routine routineType, Controller controller) {
+    public SysIDCommand(Swerve swerveDrive, Routine routineType) {
         this.swerve = swerveDrive;
         this.routineType = routineType;
 
         this.modules = swerve.getModules();
-        this.controller = controller;
 
         this.createRoutine(routineType);
 
@@ -147,7 +148,7 @@ public class SysIDCommand extends Command {
             case STEER_QUASISTATIC:
             case STEER_QUASISTATIC_REVERSE:
                 controller
-                        .zero()
+                        .rightBumper()
                         .whileTrue(routine.quasistatic(
                                 routineType.equals(Routine.DRIVE_VELOCITY_QUASISTATIC)
                                                 || routineType.equals(Routine.STEER_QUASISTATIC)
@@ -159,7 +160,7 @@ public class SysIDCommand extends Command {
             case STEER_DYNAMIC:
             case STEER_DYNAMIC_REVERSE:
                 controller
-                        .zero()
+                        .rightBumper()
                         .whileTrue(routine.dynamic(
                                 routineType.equals(Routine.DRIVE_VELOCITY_DYNAMIC)
                                                 || routineType.equals(Routine.STEER_DYNAMIC)
