@@ -117,19 +117,31 @@ public class SwerveConfigurator {
         SwerveConfigurator defaultConfig = defaultSimConfigurator();
         return new Module[] {
             new Module(
-                    new ModuleIOSim(swerveDriveSimulation.getModules()[0]),
+                    new ModuleIOSim(
+                            swerveDriveSimulation.getModules()[0],
+                            defaultConfig.swerveDriveRobotConstants,
+                            defaultConfig.moduleConstants[0]),
                     defaultConfig.swerveDriveRobotConstants,
                     defaultConfig.moduleConstants[0]),
             new Module(
-                    new ModuleIOSim(swerveDriveSimulation.getModules()[1]),
+                    new ModuleIOSim(
+                            swerveDriveSimulation.getModules()[1],
+                            defaultConfig.swerveDriveRobotConstants,
+                            defaultConfig.moduleConstants[1]),
                     defaultConfig.swerveDriveRobotConstants,
                     defaultConfig.moduleConstants[1]),
             new Module(
-                    new ModuleIOSim(swerveDriveSimulation.getModules()[2]),
+                    new ModuleIOSim(
+                            swerveDriveSimulation.getModules()[2],
+                            defaultConfig.swerveDriveRobotConstants,
+                            defaultConfig.moduleConstants[2]),
                     defaultConfig.swerveDriveRobotConstants,
                     defaultConfig.moduleConstants[2]),
             new Module(
-                    new ModuleIOSim(swerveDriveSimulation.getModules()[3]),
+                    new ModuleIOSim(
+                            swerveDriveSimulation.getModules()[3],
+                            defaultConfig.swerveDriveRobotConstants,
+                            defaultConfig.moduleConstants[3]),
                     defaultConfig.swerveDriveRobotConstants,
                     defaultConfig.moduleConstants[3])
         };

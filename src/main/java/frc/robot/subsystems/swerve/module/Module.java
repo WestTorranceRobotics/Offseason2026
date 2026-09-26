@@ -5,7 +5,6 @@ import static org.wpilib.units.Units.*;
 import frc.robot.subsystems.swerve.SwerveConfigurator;
 import org.littletonrobotics.junction.Logger;
 import org.wpilib.math.controller.PIDController;
-import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModulePosition;
 import org.wpilib.math.kinematics.SwerveModuleVelocity;
@@ -20,9 +19,7 @@ public class Module {
     private final SwerveConfigurator.SwerveDriveRobotConstants robotConstants;
 
     private final PIDController steerPIDController;
-    private final PIDController drivePIDController;
 
-    private final SimpleMotorFeedforward driveFeedforward;
     private final double steerVoltageCoefficient;
 
     private final String moduleName;
@@ -48,10 +45,6 @@ public class Module {
                 new PIDController(moduleConstants.AZIMUTH_P, moduleConstants.AZIMUTH_I, moduleConstants.AZIMUTH_D);
         this.steerPIDController.enableContinuousInput(-Math.PI, Math.PI);
         this.steerPIDController.setTolerance(0.05);
-
-        this.drivePIDController =
-                new PIDController(moduleConstants.DRIVE_P, moduleConstants.DRIVE_I, moduleConstants.DRIVE_D);
-        this.driveFeedforward = new SimpleMotorFeedforward(moduleConstants.DRIVE_S, moduleConstants.DRIVE_V, 0);
     }
 
     public void updateInputs() {
@@ -82,7 +75,6 @@ public class Module {
         }
         desiredState.velocity = speed.in(MetersPerSecond);
         steerPIDController.setSetpoint(desiredState.angle.getRadians());
-        drivePIDController.setSetpoint(desiredState.velocity);
     }
 
     public SwerveModuleVelocity getDesiredState() {
@@ -125,8 +117,8 @@ public class Module {
     public void tickPID() {
         io.setSteerVoltage(Volts.of(steerVoltageCoefficient * steerPIDController.calculate(inputs.steerAngleRad)));
 
-        io.setDriveVoltage(Volts.of(drivePIDController.calculate(
-                        inputs.driveWheelVelocityRPS * robotConstants.wheelCircumference.in(Meters))
-                + driveFeedforward.calculate(desiredState.velocity)));
+        // Drive closed-loop control is separated
+        io.setDriveVelocity(
+                RotationsPerSecond.of(desiredState.velocity / robotConstants.wheelCircumference.in(Meters)));
     }
 }

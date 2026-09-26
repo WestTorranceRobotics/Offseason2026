@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -20,6 +21,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.subsystems.swerve.SwerveConfigurator;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.system.RobotController;
+import org.wpilib.units.measure.AngularVelocity;
 import org.wpilib.units.measure.Voltage;
 
 public class ModuleIOReal implements ModuleIO {
@@ -28,6 +30,9 @@ public class ModuleIOReal implements ModuleIO {
     private final TalonFX driveMotorController;
     private final SparkMax steerMotorController;
     private final CANcoder CANCoder;
+
+    // Gains come from Slot 0, which is configured in the constructor from the module constants
+    private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(RotationsPerSecond.of(0)).withSlot(0);
 
     // TODO Document this
     public ModuleIOReal(SwerveConfigurator.SwerveDriveModuleConstants moduleConstants) {
@@ -95,6 +100,13 @@ public class ModuleIOReal implements ModuleIO {
     @Override
     public void setDriveVoltage(Voltage voltage) {
         driveMotorController.setVoltage(voltage.in(Volts));
+    }
+
+    @Override
+    public void setDriveVelocity(AngularVelocity wheelVelocity) {
+        // driveGearRatio is wheel rotations per motor rotation
+        AngularVelocity motorVelocity = wheelVelocity.div(moduleConstants.driveGearRatio);
+        driveMotorController.setControl(driveVelocityRequest.withVelocity(motorVelocity));
     }
 
     @Override
