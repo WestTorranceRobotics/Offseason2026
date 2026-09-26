@@ -9,6 +9,8 @@ public interface IntakeIO {
         public double intakeRPM = 0.0;
         public double pivotRPM = 0.0;
 
+        public double intakeCurrent = 0.0;
+
         public String pivotPosition = "UP";
     }
 

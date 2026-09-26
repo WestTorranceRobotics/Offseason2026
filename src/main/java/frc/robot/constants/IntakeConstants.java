@@ -4,6 +4,8 @@ public class IntakeConstants {
     public static final int INTAKE_MOTOR_ID = 4;
     public static final int PIVOT_MOTOR_ID = 2;
 
+    public static final double INTAKE_SLEW_RATE_LIMITER = 2.0;
+
     public static final int INTAKE_MOTOR_CURRENT_LIMIT = 30;
     public static final int PIVOT_MOTOR_CURRENT_LIMIT = 40;
 

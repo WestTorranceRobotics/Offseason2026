@@ -103,7 +103,8 @@ public class FuelPhysicsSim {
     private static final double CARRY_GRID_SPACING = BALL_DIAMETER * 1.1;
     private static final int DEFAULT_HOPPER_SIZE = 45;
     private static final int DEFAULT_HOPPER_LAYERS = 3;
-    private static final double DEFAULT_HOPPER_FLOW_PER_RPM = 0.0004; // if you have a good hopper, this will be a LOT higher
+    private static final double DEFAULT_HOPPER_FLOW_PER_RPM =
+            0.0004; // if you have a good hopper, this will be a LOT higher
     private static final double DEFAULT_FEEDER_WHEEL_DIAMETER = 0.1;
     private static final int DEFAULT_FEEDER_CAPACITY = 3; // balls that can queue in the feeder
     private static final double HOPPER_RUN_RPM = 50.0; // hopper "on" threshold
@@ -2295,7 +2296,7 @@ public class FuelPhysicsSim {
 
     /**
      * Advance balls through the feeder pipe toward the launcher. Balls leave the hopper/indxer at a rate set
-     * by hopper/feeder RPM, slide into the pipe, move along and shoot out. 
+     * by hopper/feeder RPM, slide into the pipe, move along and shoot out.
      * Every discharge shifts the rest of the hopper forward one slot.
      */
     private void updateFeederBalls(double dt) {

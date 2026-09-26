@@ -44,6 +44,8 @@ public class IntakeIOSim implements IntakeIO {
     public void updateInputs(IntakeIOInputs inputs) {
         updateSim();
         inputs.intakeRPM = Units.radiansPerSecondToRotationsPerMinute(rollerSim.getAngularVelocity());
+        inputs.intakeCurrent = rollerSim.getCurrentDraw();
+
         inputs.pivotRPM = Units.radiansPerSecondToRotationsPerMinute(pivotSim.getVelocity());
         double pivotAngle = pivotSim.getAngle();
         inputs.pivotPosition = pivotAngle <= PIVOT_ENCODER_POSITION_DEADBAND

@@ -1,10 +1,9 @@
 package frc.robot.commands.swerve;
 
-import frc.robot.constants.SwerveDriveConstants;
-import frc.robot.subsystems.swerve.Swerve;
-
 import static frc.robot.utilities.InputProcessing.*;
 
+import frc.robot.constants.SwerveDriveConstants;
+import frc.robot.subsystems.swerve.Swerve;
 import java.util.function.DoubleSupplier;
 import org.wpilib.command2.Command;
 import org.wpilib.math.kinematics.ChassisVelocities;

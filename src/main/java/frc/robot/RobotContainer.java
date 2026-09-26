@@ -58,7 +58,7 @@ public class RobotContainer {
     private final Intake intake;
     private final Hopper hopper;
 
-	private final CommandGamepad controller = new CommandGamepad(0);
+    private final CommandGamepad controller = new CommandGamepad(0);
     private final CommandGamepad overrideController = new CommandGamepad(1);
 
     public static SwerveDriveSimulation3D swerveDriveSimulation;
@@ -152,21 +152,20 @@ public class RobotContainer {
         //         .southFace()
         //         .whileTrue(new AlignAndShootCommand(
         //                 controller::getLeftX, controller::getLeftY, swerveDrive, shooter, intake, hopper, vision));
-        controller
-                .southFace()
-                .whileTrue(new OverrideShootCommand(shooter, intake, hopper, 2500.0));
+        controller.southFace().whileTrue(new OverrideShootCommand(shooter, intake, hopper, 2500.0));
 
         // align button mapping
         // controller
         //         .eastFace()
         //         .whileTrue(
-        //                 new AlignCommand(controller::getLeftX, controller::getLeftY, vision::getYawOfHub, swerveDrive));
+        //                 new AlignCommand(controller::getLeftX, controller::getLeftY, vision::getYawOfHub,
+        // swerveDrive));
 
         new Trigger(() -> controller.getLeftTriggerAxis() > 0.5).whileTrue(new IntakeCommand(intake));
         controller.leftBumper().whileTrue(new OutakeCommand(intake));
 
-        controller.povUp().whileTrue(new PivotUpCommand(intake));
-        controller.povDown().whileTrue(new PivotDownCommand(intake));
+        controller.dpadUp().whileTrue(new PivotUpCommand(intake));
+        controller.dpadDown().whileTrue(new PivotDownCommand(intake));
 
         overrideController
                 .southFace()

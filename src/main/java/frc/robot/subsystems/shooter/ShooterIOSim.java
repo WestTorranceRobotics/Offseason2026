@@ -7,7 +7,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-
 import java.util.Random;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
@@ -21,7 +20,8 @@ import org.wpilib.simulation.RoboRioSim;
 import org.wpilib.units.measure.Voltage;
 
 public class ShooterIOSim implements ShooterIO {
-    private static final double FLYWHEEL_SHOT_DIP_RPM = new Random().nextInt(500) + 201; // RPM lost per shot (compression)
+    private static final double FLYWHEEL_SHOT_DIP_RPM =
+            new Random().nextInt(500) + 201; // RPM lost per shot (compression)
 
     private final SparkMax feederMotor = new SparkMax(1, FEEDER_MOTOR_ID, MotorType.kBrushless);
     private final SparkMax flywheelMotor = new SparkMax(1, SHOOTER_MOTOR_1_ID, MotorType.kBrushless);
@@ -77,7 +77,7 @@ public class ShooterIOSim implements ShooterIO {
                 Units.radiansPerSecondToRotationsPerMinute(feederSim.getAngularVelocity()),
                 RoboRioSim.getVInVoltage(),
                 0.02);
-    
+
         double totalCurrent = flywheelSim.getCurrentDraw() + feederSim.getCurrentDraw();
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(totalCurrent));
     }
@@ -116,7 +116,7 @@ public class ShooterIOSim implements ShooterIO {
                 vx * launchHeading.getSin() + vy * launchHeading.getCos(),
                 vz);
 
-        // Launcher exit in robot-relative coordinates 
+        // Launcher exit in robot-relative coordinates
         Translation3d shooterExit = new Translation3d(SHOOTER_X_OFFSET, SHOOTER_Y_OFFSET, SHOOTER_Z_OFFSET);
 
         // Feed fuel from the hopper through the feeder, then shoot

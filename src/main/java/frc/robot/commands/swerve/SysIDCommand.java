@@ -5,8 +5,6 @@ import static org.wpilib.units.Units.Second;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.units.Units.Volts;
 
-import java.lang.ModuleLayer.Controller;
-
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.module.Module;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;

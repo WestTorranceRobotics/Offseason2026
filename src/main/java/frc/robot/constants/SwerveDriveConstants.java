@@ -20,8 +20,8 @@ public final class SwerveDriveConstants {
 
         public static final int FR_DRIVE_MOTOR_ID = 52;
         public static final int FL_DRIVE_MOTOR_ID = 33;
-        public static final int BL_DRIVE_MOTOR_ID = 34;
-        public static final int BR_DRIVE_MOTOR_ID = 54;
+        public static final int BL_DRIVE_MOTOR_ID = 54;
+        public static final int BR_DRIVE_MOTOR_ID = 34;
 
         public static final int FR_AZIMUTH_MOTOR_ID = 11;
         public static final int FL_AZIMUTH_MOTOR_ID = 14;
@@ -78,7 +78,7 @@ public final class SwerveDriveConstants {
                             0,
                             3,
                             false,
-                            1 / 6.2);
+                            1.0 / 6.2);
             public static SwerveConfigurator.SwerveDriveModuleConstants FRModuleConstants =
                     new SwerveConfigurator.SwerveDriveModuleConstants(
                             FLModuleConstants,
